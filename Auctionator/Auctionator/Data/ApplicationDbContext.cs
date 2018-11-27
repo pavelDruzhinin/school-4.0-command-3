@@ -12,10 +12,7 @@ namespace Auctionator.Data
         {
 
         }
-        public DbSet<Owner> Owners { get; set; }
-        public DbSet<Buyer> Buyers { get; set; }
         public DbSet<Subscriber> Subscribers { get; set; }
-        public DbSet<Winner> Winners { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Auction> Auctions { get; set; }
 
@@ -24,10 +21,7 @@ namespace Auctionator.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new UserMap());
-            modelBuilder.ApplyConfiguration(new OwnerMap());
-            modelBuilder.ApplyConfiguration(new BuyerMap());
             modelBuilder.ApplyConfiguration(new SubscriberMap());
-            modelBuilder.ApplyConfiguration(new WinnerMap());
             modelBuilder.ApplyConfiguration(new ProductMap());
             modelBuilder.ApplyConfiguration(new AuctionMap());
         }

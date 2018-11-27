@@ -11,9 +11,10 @@ namespace Auctionator.Models
     /// </summary>
     public class User : IdentityUser 
     {
-        public Owner Owner { get; set; }
-        public Buyer Buyer { get; set; }
         public Subscriber Subscriber { get; set; }
-        public Winner Winner { get; set; }
+
+        public IList<Product> OwnProducts { get; set; }
+        public IList<Product> BoughtProducts { get; set; }
+        public IList<Auction> WonAuctions { get; set; }
     }
 }

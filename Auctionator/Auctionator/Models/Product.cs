@@ -18,8 +18,8 @@ namespace Auctionator.Models
         public int AuctionId { get; set; }
         public Auction Auction { get; set; }
         public string OwnerId { get; set; }
-        public Owner Owner { get; set; }
+        public User Owner { get; set; }
         public string BuyerId { get; set; }
-        public Buyer Buyer { get; set; }
+        public User Buyer { get; set; }
     }
 }

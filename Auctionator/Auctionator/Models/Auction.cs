@@ -18,6 +18,6 @@ namespace Auctionator.Models
         public Product Product { get; set; }
         public IList<Subscriber> Subscribers { get; set; }
         public string WinnerId { get; set; } // Победитель на данный момент
-        public Winner Winner { get; set; }
+        public User Winner { get; set; }
     }
 }
