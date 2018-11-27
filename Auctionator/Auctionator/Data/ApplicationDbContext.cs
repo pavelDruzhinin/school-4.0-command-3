@@ -12,18 +12,18 @@ namespace Auctionator.Data
         {
 
         }
-        public DbSet<Subscriber> Subscribers { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Auction> Auctions { get; set; }
+        public DbSet<SubscribedAuction> SubscribedAuctions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new UserMap());
-            modelBuilder.ApplyConfiguration(new SubscriberMap());
             modelBuilder.ApplyConfiguration(new ProductMap());
             modelBuilder.ApplyConfiguration(new AuctionMap());
+            modelBuilder.ApplyConfiguration(new SubscribedAuctionMap());
         }
     }
 }

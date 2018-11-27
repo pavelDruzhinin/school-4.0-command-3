@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 
 namespace Auctionator.Models
 {
-    public class Subscriber 
+    public class SubscribedAuction 
     {
         public string UserId { get; set; }
         public User User { get; set; }
-        public IList<Auction> Auctions { get; set; }
+        public int AuctionId { get; set; }
+        public Auction Auction { get; set; }
     }
 }

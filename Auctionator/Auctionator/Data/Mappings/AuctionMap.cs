@@ -19,7 +19,6 @@ namespace Auctionator.Data.Mappings
             builder.Property(x => x.StartPrice).IsRequired();
 
             builder.HasOne(x => x.Product).WithOne(x => x.Auction).HasForeignKey<Product>(x => x.AuctionId);
-            builder.HasMany(x => x.Subscribers);
             builder.HasOne(x => x.Winner).WithMany(x => x.WonAuctions).HasForeignKey(x => x.WinnerId);
         }
     }

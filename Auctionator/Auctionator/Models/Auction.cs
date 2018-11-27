@@ -16,7 +16,7 @@ namespace Auctionator.Models
         public double LastBet { get; set; } // Последняя ставка (цена) на данный момент
         public int ProductId { get; set; }
         public Product Product { get; set; }
-        public IList<Subscriber> Subscribers { get; set; }
+        public IList<SubscribedAuction> SubscribedAuctions { get; set; }
         public string WinnerId { get; set; } // Победитель на данный момент
         public User Winner { get; set; }
     }
