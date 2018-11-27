@@ -14,5 +14,6 @@ namespace Auctionator.Models
         public Owner Owner { get; set; }
         public Buyer Buyer { get; set; }
         public Subscriber Subscriber { get; set; }
+        public Winner Winner { get; set; }
     }
 }

@@ -9,6 +9,6 @@ namespace Auctionator.Models
     {
         public string UserId { get; set; }
         public User User { get; set; }
-        public List<Product> Products { get; set; }
+        public IList<Product> Products { get; set; }
     }
 }

@@ -12,8 +12,9 @@ namespace Auctionator.Data.Mappings
     {
         public void Configure(EntityTypeBuilder<Owner> builder)
         {
-            builder.HasOne(x => x.User);
-            builder.HasMany(x => x.Products);
+            builder.HasKey(x => x.UserId);
+            builder.HasOne(x => x.User).WithOne(x => x.Owner);
+            builder.HasMany(x => x.Products).WithOne(x => x.Owner).HasForeignKey(x => x.OwnerId);
         }        
     }
 }
