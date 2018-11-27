@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Auctionator.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.SpaServices.Webpack;
 
 namespace Auctionator
 {
@@ -50,6 +51,11 @@ namespace Auctionator
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                app.UseWebpackDevMiddleware(
+                    new WebpackDevMiddlewareOptions
+                    {
+                        HotModuleReplacement = true
+                    });
             }
             else
             {
