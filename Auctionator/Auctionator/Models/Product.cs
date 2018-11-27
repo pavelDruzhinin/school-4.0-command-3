@@ -15,5 +15,6 @@ namespace Auctionator.Models
 
         public string OwnerId { get; set; }
         public Owner Owner { get; set; }
+        public List<Subscriber> Subscribers { get; set; }
     }
 }

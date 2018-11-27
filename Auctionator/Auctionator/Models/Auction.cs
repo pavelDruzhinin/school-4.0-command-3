@@ -14,7 +14,7 @@ namespace Auctionator.Models
         public uint PurchasePrice { get; set; } // Пусть все цены будут целочисленными и больше 0, чтоб не запарно было
         public uint StartPrice { get; set; }
         public uint LastBet { get; set; } // последняя ставка на данный момент
-        public Buyer Buyer { get; set; } // покупатель на данный момент
+        public List<Buyer> Buyers { get; set; } // покупатель на данный момент
         public string BuyerId { get; set; } 
         public DateTime RegDate { get; set; }
     }

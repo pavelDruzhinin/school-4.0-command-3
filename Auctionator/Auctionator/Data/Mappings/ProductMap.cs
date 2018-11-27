@@ -14,6 +14,7 @@ namespace Auctionator.Data.Mappings
         {
             builder.HasKey(x => x.Id);
             builder.HasOne(x => x.Owner);
+            builder.HasMany(x => x.Subscribers);
         }
     }
 }

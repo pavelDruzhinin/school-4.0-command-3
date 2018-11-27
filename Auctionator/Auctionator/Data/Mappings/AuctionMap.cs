@@ -8,12 +8,13 @@ using Auctionator.Models;
 
 namespace Auctionator.Data.Mappings
 {
-    public class BuyerMap : IEntityTypeConfiguration<Buyer>
+    public class AuctionMap : IEntityTypeConfiguration<Auction>
     {
-        public void Configure(EntityTypeBuilder<Buyer> builder)
+        public void Configure(EntityTypeBuilder<Auction> builder)
         {
-            builder.HasOne(x => x.User);
-            builder.HasMany(x => x.Auctions); //Many or One?
+            builder.HasKey(x => x.Id);
+            builder.HasOne(x => x.Product);
+            builder.HasMany(x => x.Buyers);
         }
     }
 }
