@@ -13,7 +13,6 @@ namespace Auctionator.Data
 
         }
 
-        public DbSet<User> Users { get; set; }
         public DbSet<Owner> Owners { get; set; }
         public DbSet<Subscriber> Subscribers { get; set; }
         public DbSet<Buyer> Buyers { get; set; }

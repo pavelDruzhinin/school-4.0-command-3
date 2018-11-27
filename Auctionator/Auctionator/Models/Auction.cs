@@ -9,9 +9,13 @@ namespace Auctionator.Models
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public string Status { get; set; }
-        public double PurchasingPrice { get; set; }
-        public double StartingPrice { get; set; }
+        public Product Product { get; set; }
+        public string Status { get; set; } // TODO: подумать нужен ли статус для аукциона или хватит только для товара
+        public uint PurchasePrice { get; set; } // Пусть все цены будут целочисленными и больше 0, чтоб не запарно было
+        public uint StartPrice { get; set; }
+        public uint LastBet { get; set; } // последняя ставка на данный момент
+        public Buyer Buyer { get; set; } // покупатель на данный момент
+        public string BuyerId { get; set; } 
         public DateTime RegDate { get; set; }
     }
 }

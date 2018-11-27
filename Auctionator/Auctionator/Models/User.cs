@@ -2,20 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace Auctionator.Models
 {
-    public class User
+    /// <summary>
+    /// Класс User наследует все поля IdentityUser, в т.ч. UserName
+    /// </summary>
+    public class User : IdentityUser 
     {
-        public User()
-        {
-
-        }
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Email { get; set; }
-
         public Owner Owner { get; set; }
         public Buyer Buyer { get; set; }
         public Subscriber Subscriber { get; set; }

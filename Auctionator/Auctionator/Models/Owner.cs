@@ -7,10 +7,8 @@ namespace Auctionator.Models
 {
     public class Owner
     {
-        public int UserId { get; set; }
-        public List<Product> Products { get; set; }
-
+        public string UserId { get; set; }
         public User User { get; set; }
-        public Product Product { get; set; }
+        public List<Product> Products { get; set; }
     }
 }

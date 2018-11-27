@@ -7,7 +7,7 @@ namespace Auctionator.Models
 {
     public class Buyer 
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public List<Auction> Auctions { get; set; }
         public User User { get; set; }
     }
