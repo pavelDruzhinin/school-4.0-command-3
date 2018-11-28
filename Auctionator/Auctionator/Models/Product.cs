@@ -14,8 +14,9 @@ namespace Auctionator.Models
         public IList<ProductPhoto> Photos { get; set; }
         public string Description { get; set; }
         public string ShortDescription { get; set; }
-        public ProductStatus Status { get; set; } 
+        public ProductStatus Status { get; set; }
 
+        public IList<SubscribedProduct> SubscribedProducts { get; set; }
         public int AuctionId { get; set; }
         public Auction Auction { get; set; }
         public string OwnerId { get; set; }

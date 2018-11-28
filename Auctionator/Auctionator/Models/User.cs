@@ -20,12 +20,12 @@ namespace Auctionator.Models
         /// </summary>
         public IList<Product> BoughtProducts { get; set; }
         /// <summary>
+        /// Товары, на которые пользователь подписан
+        /// </summary>
+        public IList<SubscribedProduct> SubscribedProducts { get; set; }
+        /// <summary>
         /// Аукционы, выигранные пользователем
         /// </summary>
         public IList<Auction> WonAuctions { get; set; }
-        /// <summary>
-        /// Аукционы, на которые пользователь подписан
-        /// </summary>
-        public IList<SubscribedAuction> SubscribedAuctions { get; set; }
     }
 }
