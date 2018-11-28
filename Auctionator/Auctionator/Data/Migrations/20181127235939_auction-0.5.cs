@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Auctionator.Data.Migrations
 {
@@ -14,6 +15,10 @@ namespace Auctionator.Data.Migrations
                 name: "PK_ProductPhoto",
                 table: "ProductPhoto");
 
+            migrationBuilder.DropColumn(
+                name: "Photo",
+                table: "ProductPhoto");
+
             migrationBuilder.RenameTable(
                 name: "ProductPhoto",
                 newName: "ProductPhotos");
@@ -22,6 +27,11 @@ namespace Auctionator.Data.Migrations
                 name: "IX_ProductPhoto_ProductId",
                 table: "ProductPhotos",
                 newName: "IX_ProductPhotos_ProductId");
+
+            migrationBuilder.AddColumn<string>(
+                name: "Path",
+                table: "ProductPhotos",
+                nullable: true);
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_ProductPhotos",
@@ -47,6 +57,10 @@ namespace Auctionator.Data.Migrations
                 name: "PK_ProductPhotos",
                 table: "ProductPhotos");
 
+            migrationBuilder.DropColumn(
+                name: "Path",
+                table: "ProductPhotos");
+
             migrationBuilder.RenameTable(
                 name: "ProductPhotos",
                 newName: "ProductPhoto");
@@ -55,6 +69,11 @@ namespace Auctionator.Data.Migrations
                 name: "IX_ProductPhotos_ProductId",
                 table: "ProductPhoto",
                 newName: "IX_ProductPhoto_ProductId");
+
+            migrationBuilder.AddColumn<byte[]>(
+                name: "Photo",
+                table: "ProductPhoto",
+                nullable: true);
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_ProductPhoto",
