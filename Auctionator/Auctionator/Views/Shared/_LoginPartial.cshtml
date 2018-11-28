@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Identity
+п»ї@using Microsoft.AspNetCore.Identity
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
@@ -14,11 +14,11 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class='nav-link' asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@UserManager.GetUserName(User)</a>
-                    <a class="dropdown-item" href="#">@(new Microsoft.AspNetCore.Html.HtmlString("Личные данные"))</a>
-                    <a class="dropdown-item" href="#">Мои товары</a>
-                    <a class="dropdown-item" href="#">Мои аукционы</a>
-                    <a class="dropdown-item" href="#">Корзина</a>
-                    <a class="dropdown-item" href="#">Выход</a>
+                    <a class="dropdown-item" href="#">@(new Microsoft.AspNetCore.Html.HtmlString("Р›РёС‡РЅС‹Рµ РґР°РЅРЅС‹Рµ"))</a>
+                    <a class="dropdown-item" href="#">РњРѕРё С‚РѕРІР°СЂС‹</a>
+                    <a class="dropdown-item" href="#">РњРѕРё Р°СѓРєС†РёРѕРЅС‹</a>
+                    <a class="dropdown-item" href="#">РљРѕСЂР·РёРЅР°</a>
+                    <a class="dropdown-item" href="#">Р’С‹С…РѕРґ</a>
                 </div>
             </li>
             <li class="nav-item">
