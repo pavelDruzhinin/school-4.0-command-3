@@ -1,4 +1,4 @@
-﻿namespace Auctionator.Models
+namespace Auctionator.Models
 {
     public class ProductPhoto
     {

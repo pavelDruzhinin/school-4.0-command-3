@@ -1,27 +1,30 @@
-п»їusing System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
 namespace Auctionator.Models
 {
     /// <summary>
-    /// РљР»Р°СЃСЃ User РЅР°СЃР»РµРґСѓРµС‚ РІСЃРµ РїРѕР»СЏ IdentityUser, РІ С‚.С‡. UserName
+    /// Класс User наследует все поля IdentityUser, в т.ч. UserName
     /// </summary>
-    public class User : IdentityUser
+    public class User : IdentityUser 
     {
         /// <summary>
-        /// РўРѕРІР°СЂС‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ, РІС‹СЃС‚Р°РІР»РµРЅРЅС‹Рµ РЅР° РїСЂРѕРґР°Р¶Сѓ
+        /// Товары пользователя, выставленные на продажу
         /// </summary>
         public IList<Product> OwnProducts { get; set; }
         /// <summary>
-        /// РўРѕРІР°СЂС‹, РєСѓРїР»РµРЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј
+        /// Товары, купленные пользователем
         /// </summary>
         public IList<Product> BoughtProducts { get; set; }
         /// <summary>
-        /// РўРѕРІР°СЂС‹, РЅР° РєРѕС‚РѕСЂС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РїРѕРґРїРёСЃР°РЅ
+        /// Товары, на которые пользователь подписан
         /// </summary>
         public IList<SubscribedProduct> SubscribedProducts { get; set; }
         /// <summary>
-        /// РђСѓРєС†РёРѕРЅС‹, РІС‹РёРіСЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј
+        /// Аукционы, выигранные пользователем
         /// </summary>
         public IList<Auction> WonAuctions { get; set; }
     }

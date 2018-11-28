@@ -4,14 +4,16 @@ using Auctionator.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Auctionator.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181127210036_auction-0.2")]
+    partial class auction02
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,9 +39,13 @@ namespace Auctionator.Data.Migrations
 
                     b.Property<byte>("Status");
 
+                    b.Property<string>("SubscriberUserId");
+
                     b.Property<string>("WinnerId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SubscriberUserId");
 
                     b.HasIndex("WinnerId");
 
@@ -81,36 +87,17 @@ namespace Auctionator.Data.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Auctionator.Models.ProductPhoto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Path");
-
-                    b.Property<int>("ProductId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductPhotos");
-                });
-
-            modelBuilder.Entity("Auctionator.Models.SubscribedProduct", b =>
+            modelBuilder.Entity("Auctionator.Models.Subscriber", b =>
                 {
                     b.Property<string>("UserId");
 
-                    b.Property<int>("ProductId");
+                    b.Property<int?>("AuctionId");
 
-                    b.HasKey("UserId", "ProductId");
+                    b.HasKey("UserId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("AuctionId");
 
-                    b.ToTable("SubscribedProducts");
+                    b.ToTable("Subscribers");
                 });
 
             modelBuilder.Entity("Auctionator.Models.User", b =>
@@ -280,8 +267,12 @@ namespace Auctionator.Data.Migrations
 
             modelBuilder.Entity("Auctionator.Models.Auction", b =>
                 {
+                    b.HasOne("Auctionator.Models.Subscriber")
+                        .WithMany("Auctions")
+                        .HasForeignKey("SubscriberUserId");
+
                     b.HasOne("Auctionator.Models.User", "Winner")
-                        .WithMany("WonAuctions")
+                        .WithMany("Auctions")
                         .HasForeignKey("WinnerId");
                 });
 
@@ -293,7 +284,7 @@ namespace Auctionator.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Auctionator.Models.User", "Buyer")
-                        .WithMany("BoughtProducts")
+                        .WithMany("BuyProducts")
                         .HasForeignKey("BuyerId");
 
                     b.HasOne("Auctionator.Models.User", "Owner")
@@ -301,24 +292,15 @@ namespace Auctionator.Data.Migrations
                         .HasForeignKey("OwnerId");
                 });
 
-            modelBuilder.Entity("Auctionator.Models.ProductPhoto", b =>
+            modelBuilder.Entity("Auctionator.Models.Subscriber", b =>
                 {
-                    b.HasOne("Auctionator.Models.Product", "Product")
-                        .WithMany("Photos")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Auctionator.Models.SubscribedProduct", b =>
-                {
-                    b.HasOne("Auctionator.Models.Product", "Product")
-                        .WithMany("SubscribedProducts")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("Auctionator.Models.Auction")
+                        .WithMany("Subscribers")
+                        .HasForeignKey("AuctionId");
 
                     b.HasOne("Auctionator.Models.User", "User")
-                        .WithMany("SubscribedProducts")
-                        .HasForeignKey("UserId")
+                        .WithOne("Subscriber")
+                        .HasForeignKey("Auctionator.Models.Subscriber", "UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

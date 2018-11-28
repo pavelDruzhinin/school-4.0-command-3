@@ -1,4 +1,4 @@
-﻿namespace Auctionator.Enums
+namespace Auctionator.Enums
 {
     public enum AuctionStatus : byte
     {

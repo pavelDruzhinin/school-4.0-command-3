@@ -1,6 +1,11 @@
-﻿namespace Auctionator.Models
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Auctionator.Models
 {
-    public class SubscribedProduct
+    public class SubscribedProduct 
     {
         public string UserId { get; set; }
         public User User { get; set; }
