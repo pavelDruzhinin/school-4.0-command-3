@@ -10,11 +10,11 @@ namespace Auctionator.Controllers
 {
     public class AuctionController : Controller
     {
-        readonly IHubContext<AuctionHub> hubContext;
+        readonly IHubContext<StronglyTypedAuctionHub> _hubContext;
 
-        public AuctionController(IHubContext<AuctionHub> hubContext)
+        public AuctionController(IHubContext<StronglyTypedAuctionHub> hubContext)
         {
-            this.hubContext = hubContext;
+            _hubContext = hubContext;
         }
 
         public IActionResult Index()
@@ -25,7 +25,7 @@ namespace Auctionator.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(string product)
         {
-            await hubContext.Clients.All.SendAsync("Notify", $"Добавлено: {product} - {DateTime.Now.ToShortTimeString()}");
+            await _hubContext.Clients.All.SendAsync("Notify", $"Добавлено: {product} - {DateTime.Now.ToShortTimeString()}");
             return RedirectToAction("Index");
         }
     }

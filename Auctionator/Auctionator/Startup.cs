@@ -37,7 +37,7 @@ namespace Auctionator
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddSignalR().AddHubOptions<AuctionHub>(hubOptions => // только для Аукциона
+            services.AddSignalR().AddHubOptions<StronglyTypedAuctionHub>(hubOptions => // только для Аукциона
             {
                 hubOptions.EnableDetailedErrors = false;
                 hubOptions.KeepAliveInterval = System.TimeSpan.FromMinutes(1);
@@ -66,7 +66,7 @@ namespace Auctionator
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<AuctionHub>("/auctions", options => {
+                routes.MapHub<StronglyTypedAuctionHub>("/auctionHub", options => {
                     options.ApplicationMaxBufferSize = 64;
                     options.TransportMaxBufferSize = 64;
                     options.LongPolling.PollTimeout = System.TimeSpan.FromMinutes(1);
