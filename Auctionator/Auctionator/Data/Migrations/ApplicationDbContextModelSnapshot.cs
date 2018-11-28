@@ -89,7 +89,7 @@ namespace Auctionator.Data.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<byte[]>("Photo");
+                    b.Property<string>("Path");
 
                     b.Property<int>("ProductId");
 

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Auctionator.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181127231811_auction-0.5")]
+    [Migration("20181127235939_auction-0.5")]
     partial class auction05
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,7 +91,7 @@ namespace Auctionator.Data.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<byte[]>("Photo");
+                    b.Property<string>("Path");
 
                     b.Property<int>("ProductId");
 
