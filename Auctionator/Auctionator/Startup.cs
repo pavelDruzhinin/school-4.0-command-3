@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Auctionator.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Auctionator.Hubs;
+using Microsoft.AspNetCore.Http.Connections;
 
 namespace Auctionator
 {
@@ -24,12 +21,10 @@ namespace Auctionator
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
@@ -41,9 +36,15 @@ namespace Auctionator
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddSignalR().AddHubOptions<AuctionHub>(hubOptions => // только для Аукциона
+            {
+                hubOptions.EnableDetailedErrors = false;
+                hubOptions.KeepAliveInterval = System.TimeSpan.FromMinutes(1);
+                hubOptions.HandshakeTimeout = System.TimeSpan.FromMinutes(5); // таймаут 5 минут для бездействия пользователя
+            });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -62,6 +63,16 @@ namespace Auctionator
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<AuctionHub>("/auctions", options => {
+                    options.ApplicationMaxBufferSize = 64;
+                    options.TransportMaxBufferSize = 64;
+                    options.LongPolling.PollTimeout = System.TimeSpan.FromMinutes(1);
+                    options.Transports = HttpTransportType.LongPolling | HttpTransportType.WebSockets;
+                });
+            });
 
             app.UseMvc(routes =>
             {
