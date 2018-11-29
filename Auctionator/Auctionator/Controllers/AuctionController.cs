@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Auctionator.Hubs;
-using Auctionator.Services.Implementation;
 using Auctionator.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -27,10 +25,10 @@ namespace Auctionator.Controllers
             return View(auctions);
         }
 
-        [Route("{id:int}")]
-        public IActionResult Detail(int id)
+        [Route("detail/{id:int}")]
+        public async Task<IActionResult> Detail(int id)
         {
-            var auction = _auctionService.GetAuctionById(id);
+            var auction = await _auctionService.GetAuctionById(id);
             return View(auction);
         }
     }
