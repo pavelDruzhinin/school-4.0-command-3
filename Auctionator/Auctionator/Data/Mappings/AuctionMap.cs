@@ -20,6 +20,7 @@ namespace Auctionator.Data.Mappings
 
             builder.HasOne(x => x.Product).WithOne(x => x.Auction).HasForeignKey<Product>(x => x.AuctionId);
             builder.HasOne(x => x.Winner).WithMany(x => x.WonAuctions).HasForeignKey(x => x.WinnerId);
+            builder.HasMany(x => x.Bets).WithOne(x => x.Auction).HasForeignKey(x => x.AuctionId);
         }
     }
 }

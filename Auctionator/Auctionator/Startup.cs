@@ -10,6 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Auctionator.Hubs;
 using Microsoft.AspNetCore.Http.Connections;
+using Auctionator.Services.Interface;
+using Auctionator.Services.Implementation;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Auctionator
 {
@@ -24,6 +27,7 @@ namespace Auctionator
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IAuctionService, AuctionService>();
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;
@@ -38,7 +42,7 @@ namespace Auctionator
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddSignalR().AddHubOptions<StronglyTypedAuctionHub>(hubOptions => // только для Аукциона
+            services.AddSignalR().AddHubOptions<AuctionHub>(hubOptions => // только для Аукциона
             {
                 hubOptions.EnableDetailedErrors = false;
                 hubOptions.KeepAliveInterval = System.TimeSpan.FromMinutes(1);
@@ -67,7 +71,7 @@ namespace Auctionator
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<StronglyTypedAuctionHub>("/auctionHub", options => {
+                routes.MapHub<AuctionHub>("/auctionHub", options => {
                     options.ApplicationMaxBufferSize = 64;
                     options.TransportMaxBufferSize = 64;
                     options.LongPolling.PollTimeout = System.TimeSpan.FromMinutes(1);

@@ -12,10 +12,12 @@ namespace Auctionator.Data
         {
 
         }
+
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductPhoto> ProductPhotos { get; set; }
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<SubscribedProduct> SubscribedProducts { get; set; }
+        public DbSet<Bet> Bets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,6 +28,7 @@ namespace Auctionator.Data
             modelBuilder.ApplyConfiguration(new ProductPhotoMap());
             modelBuilder.ApplyConfiguration(new AuctionMap());
             modelBuilder.ApplyConfiguration(new SubscribedProductMap());
+            modelBuilder.ApplyConfiguration(new BetMap());
         }
     }
 }

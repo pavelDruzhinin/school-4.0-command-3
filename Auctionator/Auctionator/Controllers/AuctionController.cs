@@ -1,32 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Auctionator.Hubs;
+using Auctionator.Services.Implementation;
+using Auctionator.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Auctionator.Controllers
 {
+    [Route("auction")]
     public class AuctionController : Controller
     {
-        readonly IHubContext<StronglyTypedAuctionHub> _hubContext;
+        readonly IHubContext<AuctionHub> _hubContext;
+        private readonly IAuctionService _auctionService;
 
-        public AuctionController(IHubContext<StronglyTypedAuctionHub> hubContext)
+        public AuctionController(IHubContext<AuctionHub> hubContext, IAuctionService auctionService)
         {
             _hubContext = hubContext;
+            _auctionService = auctionService;
         }
 
-        public IActionResult Index()
+        [Route("")]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var auctions = await _auctionService.GetAll();
+            return View(auctions);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(string product)
+        [Route("{id:int}")]
+        public IActionResult Detail(int id)
         {
-            await _hubContext.Clients.All.SendAsync("Notify", $"Добавлено: {product} - {DateTime.Now.ToShortTimeString()}");
-            return RedirectToAction("Index");
+            var auction = _auctionService.GetAuctionById(id);
+            return View(auction);
         }
     }
 }

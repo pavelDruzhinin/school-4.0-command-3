@@ -1,41 +1,65 @@
-﻿@{
-    ViewData["Title"] = "Список аукционов";
+﻿@model IEnumerable<Auctionator.Models.Auction>
+
+@{
+    ViewData["Title"] = "Index";
 }
 
-<br />
-<div id="inputForm">
-    <label>Имя</label><br />
-    <input type="text" id="name" /><br /><br />
-    <label>Возраст</label><br />
-    <input type="number" id="age" /><br /><br />
-    <input type="button" id="sendBtn" value="Отправить" />
-</div>
-<div><p id="response"></p></div>
+<h2>Index</h2>
 
-@section Scripts {
-    <script>
-        let hubUrl = "/auctionHub";
-        const hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl(hubUrl)
-            .build();
-
-        // получение сообщения от сервера
-        hubConnection.on("Receive", function (user) {
-
-            document.getElementById("response").innerText = "Имя: " + user.name + " Возраст: " + user.age;
-        });
-
-        // отправка сообщения на сервер
-        document.getElementById("sendBtn").addEventListener("click", function (e) {
-            let name = document.getElementById("name").value;
-            let age = document.getElementById("age").value;
-
-            hubConnection.invoke("Send", { "name": name, "age": age });
-            document.getElementById("name").value = "";
-            document.getElementById("age").value = "";
-        });
-
-        hubConnection.start();
-    </script>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Winner)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Winner.Id)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
 }
-
+    </tbody>
+</table>
