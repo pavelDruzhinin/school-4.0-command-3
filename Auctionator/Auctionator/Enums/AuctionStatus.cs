@@ -4,6 +4,7 @@ namespace Auctionator.Enums
     {
         Wait = 1,
         Active,
+        NotPaid,
         Completed,
         Canceled
     }

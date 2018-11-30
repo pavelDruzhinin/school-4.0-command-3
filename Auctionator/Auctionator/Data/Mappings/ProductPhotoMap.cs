@@ -9,6 +9,7 @@ namespace Auctionator.Data.Mappings
         public void Configure(EntityTypeBuilder<ProductPhoto> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Path).IsRequired();
             builder.HasOne(x => x.Product).WithMany(x => x.Photos).HasForeignKey(x => x.ProductId);
         }
     }
