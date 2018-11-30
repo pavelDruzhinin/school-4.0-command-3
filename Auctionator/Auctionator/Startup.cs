@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +11,6 @@ using Auctionator.Hubs;
 using Microsoft.AspNetCore.Http.Connections;
 using Auctionator.Services.Interface;
 using Auctionator.Services.Implementation;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Auctionator
 {
