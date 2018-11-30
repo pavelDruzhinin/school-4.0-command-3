@@ -20,7 +20,12 @@ namespace Auctionator.Services.Implementation
 
         public async Task<List<Auction>> GetAll(Enums.AuctionStatus status)
         {
-            return await _db.Auctions.Where(x => x.Status == status).ToListAsync();
+            return await _db.Auctions.Where(x => x.Status == status).OrderByDescending(x => x.Id).ToListAsync();
+        }
+
+        public async Task<List<Auction>> GetAuctionsByUser(string userId)
+        {
+            return await _db.Auctions.Where(x => x.WinnerId == userId).Include(x => x.Winner).OrderByDescending(x => x.Id).ToListAsync();
         }
 
         public async Task<Auction> GetAuctionById(int id)
@@ -32,7 +37,7 @@ namespace Auctionator.Services.Implementation
         {
             var dbCount = await _db.Auctions.CountAsync();
             count = dbCount < count ? dbCount : count;
-            return await _db.Auctions.Where(x => x.EndDateTime < System.DateTime.Now.AddMinutes(-1) && x.Status == Enums.AuctionStatus.Active).Take(count).ToListAsync();
+            return await _db.Auctions.Where(x => x.EndDateTime < System.DateTime.Now.AddMinutes(-1) && x.Status == Enums.AuctionStatus.Active).Take(count).OrderBy(x => x.EndDateTime).ToListAsync();
         }
 
         public async Task<Auction> Create(AuctionDto auctionDto)
@@ -69,7 +74,7 @@ namespace Auctionator.Services.Implementation
 
         public async Task<List<Bet>> GetAllBets(int auctionId)
         {
-            return await _db.Bets.Where(x => x.AuctionId == auctionId).ToListAsync();
+            return await _db.Bets.Where(x => x.AuctionId == auctionId).OrderByDescending(x => x.Id).ToListAsync();
         }
 
         public async Task<Bet> AddBet(BetDto betDto)

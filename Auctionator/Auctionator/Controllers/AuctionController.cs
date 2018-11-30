@@ -23,31 +23,46 @@ namespace Auctionator.Controllers
         }
 
         /// <summary>
-        /// Основная страница со списком аукционов (только со статусом Active)
+        /// список аукционов по "статусу", JSON
         /// </summary>
+        /// <param name="status">Статус аукциона</param>
         /// <returns></returns>
-        [Route("")]
-        public async Task<IActionResult> Index()
+        [Route("getall")]
+        public async Task<JsonResult> GetAuctions(Enums.AuctionStatus status)
         {
-            var auctions = await _auctionService.GetAll(Enums.AuctionStatus.Active);
-            return View(auctions);
+            try
+            {
+                var auctions = await _auctionService.GetAll(status);
+                return Json(new { success = true, result = auctions });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
         }
 
         /// <summary>
-        /// Страница со списком аукционов (только со статусом Completed)
+        /// Список аукционов пользователя, где он победил
         /// </summary>
+        /// <param name="userId">Id пользователя</param>
         /// <returns></returns>
-        [Route("history")]
-        public async Task<IActionResult> History()
+        public async Task<JsonResult> GetUserAuctions(string userId)
         {
-            var auctions = await _auctionService.GetAll(Enums.AuctionStatus.Completed);
-            return View(auctions);
+            try
+            {
+                var auctions = await _auctionService.GetAuctionsByUser(userId);
+                return Json(new { success = true, result = auctions });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
         }
-
+        
         /// <summary>
         /// Детали аукциона (так же используется для вывода при редактировании параметров аукциона), результат JSON
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">Id аукциона</param>
         /// <returns></returns>
         [Route("detail/{id:int}")]
         public async Task<JsonResult> Detail(int id)
@@ -66,7 +81,7 @@ namespace Auctionator.Controllers
         /// <summary>
         /// Получение списка аукционов для главной страницы, парметр count - сколько элементов надо получить, результат JSON
         /// </summary>
-        /// <param name="count"></param>
+        /// <param name="count">Счетчик выводимых аукционов</param>
         /// <returns></returns>
         [Route("getformain")]
         public async Task<JsonResult> GetAuctionForMain(int count)
@@ -85,7 +100,7 @@ namespace Auctionator.Controllers
         /// <summary>
         /// Post метод добавления товара на аукцион, получаем JSON
         /// </summary>
-        /// <param name="auction"></param>
+        /// <param name="auction">JSON для создания аукциона</param>
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
@@ -107,11 +122,11 @@ namespace Auctionator.Controllers
         /// <summary>
         /// Post метод изменения параметров аукциона, результат JSON
         /// </summary>
-        /// <param name="auction"></param>
+        /// <param name="auction">JSON для изменения параметров аукциона</param>
         /// <returns></returns>
         [HttpPost]
         [Route("update/{id:int}")]
-        public async Task<JsonResult> Update(string auction, int id)
+        public async Task<JsonResult> Update(string auction, int id) // не учитывается статус аукциона для возможности редактирования
         {
             AuctionDto auctionDto = JsonConvert.DeserializeObject<AuctionDto>(auction, new IsoDateTimeConverter { DateTimeFormat = "dd.MM.yyyy HH:mm:ss" });
 
@@ -151,7 +166,7 @@ namespace Auctionator.Controllers
         /// <summary>
         /// Получение списка ставок для аукциона
         /// </summary>
-        /// <param name="auctionId"></param>
+        /// <param name="auctionId">Id аукциона</param>
         /// <returns></returns>
         [HttpGet]
         [Route("getbets/{auctionId:int}")]

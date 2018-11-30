@@ -8,6 +8,7 @@ namespace Auctionator.Services.Interface
     public interface IAuctionService
     {
         Task<List<Auction>> GetAll(Enums.AuctionStatus status);
+        Task<List<Auction>> GetAuctionsByUser(string userId);
         Task<Auction> GetAuctionById(int id);
         Task<List<Auction>> GetAuctionsForMainPage(int count);
         Task<Auction> Create(AuctionDto auctionDto);
