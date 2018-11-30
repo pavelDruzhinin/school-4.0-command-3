@@ -16,6 +16,7 @@ namespace Auctionator.Data.Mappings
             builder.Property(x => x.Status).IsRequired();
             builder.Property(x => x.StartDateTime).IsRequired();
             builder.Property(x => x.EndDateTime).IsRequired();
+            builder.Property(x => x.EndPayDateTime).IsRequired();
             builder.Property(x => x.StartPrice).IsRequired();
 
             builder.HasOne(x => x.Product).WithOne(x => x.Auction).HasForeignKey<Product>(x => x.AuctionId);

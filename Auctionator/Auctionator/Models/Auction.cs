@@ -12,6 +12,7 @@ namespace Auctionator.Models
         public AuctionStatus Status { get; set; }
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
+        public DateTime EndPayDateTime { get; set; }
         public double StartPrice { get; set; }
         public int ProductId { get; set; }
         public Product Product { get; set; }
