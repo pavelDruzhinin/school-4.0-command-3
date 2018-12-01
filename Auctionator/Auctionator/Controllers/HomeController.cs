@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Auctionator.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Auctionator.Controllers
 {
@@ -13,6 +14,18 @@ namespace Auctionator.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        public JsonResult GetProduct()
+        {
+            string jsonData = @"{  
+                'FirstName':'Jignesh',  
+                'LastName':'Trivedi'  
+            }";
+
+            var details = JObject.Parse(jsonData);
+
+            return Json(details);
         }
 
         public IActionResult About()
