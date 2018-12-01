@@ -64,7 +64,7 @@ namespace Auctionator.Services.Implementation
 
             auc.StartDateTime = auctionDto.StartDateTime;
             auc.EndDateTime = auctionDto.StartDateTime.AddDays(3);
-            auc.Status = auctionDto.Status == Enums.AuctionStatus.Canceled ? Enums.AuctionStatus.Canceled : auctionDto.StartDateTime > System.DateTime.Now ? Enums.AuctionStatus.Wait : Enums.AuctionStatus.Active;
+            auc.Status = auctionDto.Status == Enums.AuctionStatus.Failed ? Enums.AuctionStatus.Failed : auctionDto.StartDateTime > System.DateTime.Now ? Enums.AuctionStatus.Wait : Enums.AuctionStatus.Active;
             auc.StartPrice = auctionDto.StartPrice;
 
             await _db.SaveChangesAsync();

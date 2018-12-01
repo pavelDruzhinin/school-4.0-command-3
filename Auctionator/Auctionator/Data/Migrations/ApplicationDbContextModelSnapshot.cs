@@ -29,6 +29,10 @@ namespace Auctionator.Data.Migrations
 
                     b.Property<DateTime>("EndPayDateTime");
 
+                    b.Property<double?>("LastBet");
+
+                    b.Property<int>("PaidStatus");
+
                     b.Property<int>("ProductId");
 
                     b.Property<DateTime>("StartDateTime");
@@ -85,7 +89,7 @@ namespace Auctionator.Data.Migrations
 
                     b.Property<string>("OwnerId");
 
-                    b.Property<double>("Price");
+                    b.Property<double?>("Price");
 
                     b.Property<string>("ShortDescription");
 

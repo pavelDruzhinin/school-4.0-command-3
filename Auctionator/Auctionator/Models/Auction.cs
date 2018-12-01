@@ -10,14 +10,16 @@ namespace Auctionator.Models
     {
         public int Id { get; set; }
         public AuctionStatus Status { get; set; }
+        public PaidStatus PaidStatus { get; set; }
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
         public DateTime EndPayDateTime { get; set; }
         public double StartPrice { get; set; }
+        public IList<Bet> Bets { get; set; } // Лист ставок
+        public double? LastBet { get; set; }
         public int ProductId { get; set; }
         public Product Product { get; set; }
         public string WinnerId { get; set; } // Победитель на данный момент
         public User Winner { get; set; }
-        public IList<Bet> Bets { get; set; } // Лист ставок
     }
 }
