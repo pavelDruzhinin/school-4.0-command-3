@@ -19,8 +19,8 @@ namespace Auctionator.Controllers
         public JsonResult GetProduct()
         {
             string jsonData = @"{  
-                'FirstName':'Jignesh',  
-                'LastName':'Trivedi'  
+                'startPrice':'234',  
+                'startDate':'12.12.2019'  
             }";
 
             var details = JObject.Parse(jsonData);
