@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Auctionator.Hubs;
 using Auctionator.Models.Dtos;
@@ -20,6 +23,27 @@ namespace Auctionator.Controllers
         {
             _hubContext = hubContext;
             _auctionService = auctionService;
+        }
+
+        /// <summary>
+        /// запуск аукционов
+        /// </summary>
+        /// <param name="auctionIds">список Id запускаемых аукционов</param>
+        /// <returns></returns>
+        [Route("start")]
+        public async Task<JsonResult> StartAuctions([FromBody] IList<int> auctionIds)
+        {
+            try
+            {
+                int a = auctionIds.First();
+                // изменить в БД статус на Active тех аукционов, у которых статус Wait и Id из списка auctionIds
+                return Json(new { success = true, result = HttpStatusCode.OK });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
+            
         }
 
         /// <summary>
