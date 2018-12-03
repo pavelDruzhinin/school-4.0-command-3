@@ -7,15 +7,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Newtonsoft.Json;
 
 namespace WebService
 {
-    public class Service
+    public class Service : IService
     {
+        public string Uri { get; }
         private readonly string _dbConnectionString;
         private readonly string _startDateTimeUri;
         private readonly string _endDateTimeUri;
         private readonly string _endPayDateTimeUri;
+        private bool _isUpdated = false; // обновлены ли данные словарей?
 
         public SortedDictionary<DateTime, List<int>> StartIds; // словарь <Дата и время начала аукциона, Id всех аукционов с этой датой и временем>
         public SortedDictionary<DateTime, List<int>> EndIds;
@@ -24,13 +27,14 @@ namespace WebService
         public Service()
         {
             // инициализация конфигурации
+            Uri = ConfigurationManager.ConnectionStrings["ApplicationUri"].ConnectionString;
             _dbConnectionString = ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString;
             _startDateTimeUri = ConfigurationManager.ConnectionStrings["StartDateTimeUri"].ConnectionString;
             _endDateTimeUri = ConfigurationManager.ConnectionStrings["EndDateTimeUri"].ConnectionString;
             _endPayDateTimeUri = ConfigurationManager.ConnectionStrings["EndPayDateTimeUri"].ConnectionString;
 
-            // инициальизация словарей
-            StartIds = new SortedDictionary<DateTime, List<int>>(); 
+            // инициализация словарей
+            StartIds = new SortedDictionary<DateTime, List<int>>();
             EndIds = new SortedDictionary<DateTime, List<int>>();
             EndPayIds = new SortedDictionary<DateTime, List<int>>();
             GetDataFromDb();
@@ -58,7 +62,7 @@ namespace WebService
                 if (!EndPayIds.ContainsKey(auc.EndPayDateTime))
                     EndPayIds.Add(auc.EndPayDateTime, new List<int>());
             }
-            
+
             // добавление значений в словари
             foreach (var auc in auctions)
             {
@@ -67,7 +71,54 @@ namespace WebService
                 EndPayIds[auc.EndPayDateTime].Add(auc.Id);
             }
         }
-        public async Task Run()
+
+        // Отправка данных в JSON
+        private async Task SendRequestAsync(string uri, IList<int> idList)
+        {
+            string jsonContent = JsonConvert.SerializeObject(idList);
+            await Client.RequestPostAsync(uri, jsonContent);
+        }
+
+        // Обработка переданных в JSON данных
+        public async Task HandleRequest(string requestContent)
+        {
+            await Task.Run(() =>
+            {
+                AuctionModel auction = JsonConvert.DeserializeObject<AuctionModel>(requestContent);
+                if (auction == null)
+                {
+                    Console.WriteLine("Service.HandleRequest(): модель AuctionModel == null!");
+                }
+                else
+                {
+                    SetNewDataAsync(auction);
+                    Console.WriteLine("Service.HandleRequest(): полученные данные AuctionModel:");
+                    Console.WriteLine($"{auction.Id}");
+                    Console.WriteLine($"{auction.StartDateTime}");
+                    Console.WriteLine($"{auction.EndDateTime}");
+                    Console.WriteLine($"{auction.EndPayDateTime}");
+                }
+            });
+
+        }
+
+        private void SetNewDataAsync(AuctionModel auction)
+        {
+            if (!StartIds.ContainsKey(auction.StartDateTime))
+                StartIds.Add(auction.StartDateTime, new List<int>());
+            if (!EndIds.ContainsKey(auction.EndDateTime))
+                EndIds.Add(auction.EndDateTime, new List<int>());
+            if (!EndPayIds.ContainsKey(auction.EndPayDateTime))
+                EndPayIds.Add(auction.EndPayDateTime, new List<int>());
+
+            StartIds[auction.StartDateTime].Add(auction.Id);
+            EndIds[auction.EndDateTime].Add(auction.Id);
+            EndPayIds[auction.EndPayDateTime].Add(auction.Id);
+
+            _isUpdated = true;
+        }
+
+        public async void Run()
         {
             var startDateTime = StartIds.FirstOrDefault();
             var endDateTime = EndIds.FirstOrDefault();
@@ -75,27 +126,37 @@ namespace WebService
 
             while (true)
             {
-                if (Console.ReadKey(false).KeyChar == 'a')
+                DateTime currentDateTime = DateTime.Now;
+                if (_isUpdated) // проверка, обновился ли словарь (это может произойти после обработки запроса в HadnleRequest())
                 {
-                    await ClientRole.RequestAsync(_startDateTimeUri, startDateTime.Value);
+                    startDateTime = StartIds.FirstOrDefault();
+                    endDateTime = EndIds.FirstOrDefault();
+                    endPayDateTime = EndPayIds.FirstOrDefault();
+                    _isUpdated = false;
+                }
+                if (startDateTime.Key <= currentDateTime &&
+                    startDateTime.Key != default(DateTime))
+                {
+                    await SendRequestAsync(_startDateTimeUri, startDateTime.Value);
                     StartIds.Remove(startDateTime.Key);
                     startDateTime = StartIds.FirstOrDefault();
                 }
-                if (endDateTime.Key == DateTime.Now)
+                if (endDateTime.Key <= currentDateTime &&
+                    endDateTime.Key != default(DateTime))
                 {
-                    await ClientRole.RequestAsync(_endDateTimeUri, endDateTime.Value);
+                    await SendRequestAsync(_endDateTimeUri, endDateTime.Value);
                     EndIds.Remove(endDateTime.Key);
                     endDateTime = EndIds.FirstOrDefault();
                 }
-                if (endPayDateTime.Key == DateTime.Now)
+                if (endPayDateTime.Key <= currentDateTime &&
+                    endPayDateTime.Key != default(DateTime))
                 {
-                    await ClientRole.RequestAsync(_endPayDateTimeUri, endPayDateTime.Value);
+                    await SendRequestAsync(_endPayDateTimeUri, endPayDateTime.Value);
                     EndPayIds.Remove(endPayDateTime.Key);
                     endPayDateTime = EndPayIds.FirstOrDefault();
                 }
-                Thread.Sleep(700);
+                Thread.Sleep(500);
             }
         }
-
     }
 }

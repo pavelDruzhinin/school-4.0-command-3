@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Newtonsoft.Json;
@@ -20,7 +21,13 @@ namespace WebService
         public static void Main(string[] args)
         {
             var service = new Service();
-            service.Run().Wait();
+
+            Task.Run(() => service.Run()); // запуск сервиса
+            Task.Run(() => Server.ListenAsync(service)); // запуск сервера
+
+            while (true)
+            { Thread.Sleep(500); }
+            
         }
     }
 }
