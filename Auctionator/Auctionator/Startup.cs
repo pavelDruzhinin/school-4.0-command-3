@@ -46,6 +46,16 @@ namespace Auctionator
                 hubOptions.KeepAliveInterval = System.TimeSpan.FromMinutes(1);
                 hubOptions.HandshakeTimeout = System.TimeSpan.FromMinutes(5); // таймаут 5 минут для бездействия пользователя
             });
+
+
+
+            // Добавление своих настроек
+            //var webServiceUri = Configuration.GetSection("ConnectionStrings");
+            //services.Configure<Settings.WebService>(webServiceUri);
+            //// По аналогии можно добавлять настройки из своих секций, созданных в appsettings.json.
+            //// Название элемента секции должно совпадать с именем свойства!!!
+            //var auctionSettings = Configuration.GetSection("AuctionSettings");
+            //services.Configure<Settings.Auction>(auctionSettings);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -69,7 +79,8 @@ namespace Auctionator
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<AuctionHub>("/auctionHub", options => {
+                routes.MapHub<AuctionHub>("/auctionHub", options =>
+                {
                     options.ApplicationMaxBufferSize = 64;
                     options.TransportMaxBufferSize = 64;
                     options.LongPolling.PollTimeout = System.TimeSpan.FromMinutes(1);

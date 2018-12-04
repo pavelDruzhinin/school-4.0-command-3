@@ -10,7 +10,7 @@ namespace WebService
 {
     public class Client
     {
-        public static async Task RequestPostAsync(string uri, string jsonRequestContent)
+        public static async Task RequestPostAsync(string uri, string jsonRequestContent) // TODO: сделать возврат ответа
         {
             HttpClient client = new HttpClient();
             HttpRequestMessage request = new HttpRequestMessage();

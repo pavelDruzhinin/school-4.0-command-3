@@ -27,7 +27,7 @@ namespace WebService
 
             while (true)
             { Thread.Sleep(500); }
-            
+
         }
     }
 }

@@ -37,19 +37,18 @@ namespace WebService
             StartIds = new SortedDictionary<DateTime, List<int>>();
             EndIds = new SortedDictionary<DateTime, List<int>>();
             EndPayIds = new SortedDictionary<DateTime, List<int>>();
-            GetDataFromDb();
         }
 
-        private void GetDataFromDb()
+        private async Task GetDataFromDb()
         {
-            List<AuctionModel> auctions;
+            IEnumerable<AuctionModel> auctions;
 
             using (IDbConnection db = new SqlConnection(_dbConnectionString))
             {
                 var currentDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 string query = "SELECT Id, StartDateTime, EndDateTime, EndPayDateTime FROM Auctions " +
                                $"WHERE EndPayDateTime >= '{currentDateTime}'";
-                auctions = db.Query<AuctionModel>(query).ToList();
+                auctions = await db.QueryAsync<AuctionModel>(query);
             }
 
             // добавление ключей в словари
@@ -72,6 +71,49 @@ namespace WebService
             }
         }
 
+        public async void Run()
+        {
+            //await GetDataFromDb(); // в первую очередь нужно получить данные из БД, если ещё действительны
+
+            var startDateTime = StartIds.FirstOrDefault();
+            var endDateTime = EndIds.FirstOrDefault();
+            var endPayDateTime = EndPayIds.FirstOrDefault();
+
+            while (true)
+            {
+                DateTime currentDateTime = DateTime.Now;
+                if (_isUpdated) // проверка, обновился ли словарь (это может произойти после обработки запроса в HadnleRequest())
+                {
+                    startDateTime = StartIds.FirstOrDefault();
+                    endDateTime = EndIds.FirstOrDefault();
+                    endPayDateTime = EndPayIds.FirstOrDefault();
+                    _isUpdated = false;
+                }
+                if (startDateTime.Key <= currentDateTime &&
+                    startDateTime.Key != default(DateTime))
+                {
+                    await SendRequestAsync(_startDateTimeUri, startDateTime.Value); // TODO: сделать проверку на ответ
+                    StartIds.Remove(startDateTime.Key);
+                    startDateTime = StartIds.FirstOrDefault();
+                }
+                if (endDateTime.Key <= currentDateTime &&
+                    endDateTime.Key != default(DateTime))
+                {
+                    await SendRequestAsync(_endDateTimeUri, endDateTime.Value);
+                    EndIds.Remove(endDateTime.Key);
+                    endDateTime = EndIds.FirstOrDefault();
+                }
+                if (endPayDateTime.Key <= currentDateTime &&
+                    endPayDateTime.Key != default(DateTime))
+                {
+                    await SendRequestAsync(_endPayDateTimeUri, endPayDateTime.Value);
+                    EndPayIds.Remove(endPayDateTime.Key);
+                    endPayDateTime = EndPayIds.FirstOrDefault();
+                }
+                Thread.Sleep(500);
+            }
+        }
+
         // Отправка данных в JSON
         private async Task SendRequestAsync(string uri, IList<int> idList)
         {
@@ -80,7 +122,7 @@ namespace WebService
         }
 
         // Обработка переданных в JSON данных
-        public async Task HandleRequest(string requestContent)
+        public async Task HandleRequest(string requestContent) // TODO: обработать запрос, а не содержимое
         {
             await Task.Run(() =>
             {
@@ -116,47 +158,6 @@ namespace WebService
             EndPayIds[auction.EndPayDateTime].Add(auction.Id);
 
             _isUpdated = true;
-        }
-
-        public async void Run()
-        {
-            var startDateTime = StartIds.FirstOrDefault();
-            var endDateTime = EndIds.FirstOrDefault();
-            var endPayDateTime = EndPayIds.FirstOrDefault();
-
-            while (true)
-            {
-                DateTime currentDateTime = DateTime.Now;
-                if (_isUpdated) // проверка, обновился ли словарь (это может произойти после обработки запроса в HadnleRequest())
-                {
-                    startDateTime = StartIds.FirstOrDefault();
-                    endDateTime = EndIds.FirstOrDefault();
-                    endPayDateTime = EndPayIds.FirstOrDefault();
-                    _isUpdated = false;
-                }
-                if (startDateTime.Key <= currentDateTime &&
-                    startDateTime.Key != default(DateTime))
-                {
-                    await SendRequestAsync(_startDateTimeUri, startDateTime.Value);
-                    StartIds.Remove(startDateTime.Key);
-                    startDateTime = StartIds.FirstOrDefault();
-                }
-                if (endDateTime.Key <= currentDateTime &&
-                    endDateTime.Key != default(DateTime))
-                {
-                    await SendRequestAsync(_endDateTimeUri, endDateTime.Value);
-                    EndIds.Remove(endDateTime.Key);
-                    endDateTime = EndIds.FirstOrDefault();
-                }
-                if (endPayDateTime.Key <= currentDateTime &&
-                    endPayDateTime.Key != default(DateTime))
-                {
-                    await SendRequestAsync(_endPayDateTimeUri, endPayDateTime.Value);
-                    EndPayIds.Remove(endPayDateTime.Key);
-                    endPayDateTime = EndPayIds.FirstOrDefault();
-                }
-                Thread.Sleep(500);
-            }
         }
     }
 }

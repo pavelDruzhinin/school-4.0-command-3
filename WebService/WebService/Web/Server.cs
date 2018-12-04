@@ -27,8 +27,10 @@ namespace WebService
                 string requestContent = await reader.ReadToEndAsync();
                 Console.WriteLine($"Полученные данные:");
 
+                //TODO: передать запрос, а не содержимое
                 await service.HandleRequest(requestContent); // передача данных запроса сервису для обработки
 
+                //TODO: убрать код ниже
                 string responseString = "<html><head><meta charset='utf8'></head><body>Привет мир!</body></html>";
                 byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
                 response.ContentLength64 = buffer.Length;

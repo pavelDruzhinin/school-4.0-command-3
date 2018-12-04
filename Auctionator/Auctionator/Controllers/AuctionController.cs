@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Auctionator.Hubs;
 using Auctionator.Models.Dtos;
 using Auctionator.Services.Interface;
+using Auctionator.Settings.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -30,6 +34,7 @@ namespace Auctionator.Controllers
         /// </summary>
         /// <param name="auctionIds">список Id запускаемых аукционов</param>
         /// <returns></returns>
+        [HttpPost]
         [Route("start")]
         public async Task<JsonResult> StartAuctions([FromBody] IList<int> auctionIds)
         {
@@ -42,8 +47,29 @@ namespace Auctionator.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, result = ex.Message });
-            }
-            
+            }            
+        }
+
+        //TODO: Перенести логику из этого метода в метод Create()
+        [Route("test")]
+        public async Task Test()
+        {
+            HttpClient client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage();
+
+            request.RequestUri = new Uri("http://localhost:8888/"); //TODO: добавить в конфигурацию и достать оттуда URI
+            request.Method = HttpMethod.Post;
+            request.Headers.Add("Accept", "application/json");
+
+            var auction = await _auctionService.GetAuctionById(12);
+            var auc = new {auction.Id, auction.StartDateTime, auction.EndDateTime, auction.EndPayDateTime};
+            var jsonRequestContent = JsonConvert.SerializeObject(auc);
+
+            HttpContent content = new StringContent(jsonRequestContent, Encoding.UTF8, "application/json");
+            request.Content = content;
+
+            HttpResponseMessage response = await client.SendAsync(request); // отправка запроса и получение ответа
+            //TODO: сделать обработку ответа (запретить добавление нового аукциона)
         }
 
         /// <summary>
