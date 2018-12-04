@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
 
 namespace WebService
 {
@@ -6,6 +7,6 @@ namespace WebService
     {
         string Uri { get; }
         void Run();
-        Task HandleRequest(string requestContent);
+        Task HandleRequest(HttpListenerRequest request);
     }
 }

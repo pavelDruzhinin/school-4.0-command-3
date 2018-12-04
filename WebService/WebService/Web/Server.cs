@@ -22,21 +22,10 @@ namespace WebService
                 HttpListenerRequest request = context.Request;
                 HttpListenerResponse response = context.Response;
 
-                var reader = new StreamReader(request.InputStream, request.ContentEncoding);
+                await service.HandleRequest(request); // передача данных запроса сервису для обработки
 
-                string requestContent = await reader.ReadToEndAsync();
-                Console.WriteLine($"Полученные данные:");
-
-                //TODO: передать запрос, а не содержимое
-                await service.HandleRequest(requestContent); // передача данных запроса сервису для обработки
-
-                //TODO: убрать код ниже
-                string responseString = "<html><head><meta charset='utf8'></head><body>Привет мир!</body></html>";
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
-                response.ContentLength64 = buffer.Length;
-                Stream output = response.OutputStream;
-                output.Write(buffer, 0, buffer.Length);
-                output.Close();
+                response.ContentLength64 = 0;
+                response.Close();
             }
         }
     }

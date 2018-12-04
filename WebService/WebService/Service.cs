@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -39,7 +42,7 @@ namespace WebService
             EndPayIds = new SortedDictionary<DateTime, List<int>>();
         }
 
-        private async Task GetDataFromDb()
+        protected async Task GetDataFromDb()
         {
             IEnumerable<AuctionModel> auctions;
 
@@ -71,9 +74,12 @@ namespace WebService
             }
         }
 
+        /// <summary>
+        /// Старт работы сервиса
+        /// </summary>
         public async void Run()
         {
-            //await GetDataFromDb(); // в первую очередь нужно получить данные из БД, если ещё действительны
+            await GetDataFromDb(); // в первую очередь нужно получить данные из БД, если ещё действительны
 
             var startDateTime = StartIds.FirstOrDefault();
             var endDateTime = EndIds.FirstOrDefault();
@@ -92,7 +98,7 @@ namespace WebService
                 if (startDateTime.Key <= currentDateTime &&
                     startDateTime.Key != default(DateTime))
                 {
-                    await SendRequestAsync(_startDateTimeUri, startDateTime.Value); // TODO: сделать проверку на ответ
+                    await SendRequestAsync(_startDateTimeUri, startDateTime.Value);
                     StartIds.Remove(startDateTime.Key);
                     startDateTime = StartIds.FirstOrDefault();
                 }
@@ -114,37 +120,85 @@ namespace WebService
             }
         }
 
-        // Отправка данных в JSON
-        private async Task SendRequestAsync(string uri, IList<int> idList)
+        /// <summary>
+        /// Отправка запроса серверу
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        protected async Task SendRequestAsync(string uri, IList<int> idList)
         {
-            string jsonContent = JsonConvert.SerializeObject(idList);
-            await Client.RequestPostAsync(uri, jsonContent);
+            string jsonContent = JsonConvert.SerializeObject(idList); // формиование JSON
+            var response = await Client.RequestPostAsync(uri, jsonContent); // отправка запроса, получение ответа
+            await HandleResponse(uri, response); // обработка ответа
         }
 
-        // Обработка переданных в JSON данных
-        public async Task HandleRequest(string requestContent) // TODO: обработать запрос, а не содержимое
+        /// <summary>
+        /// Обработка ответа от сервера
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        protected async Task HandleResponse(string uri, HttpResponseMessage response)
         {
-            await Task.Run(() =>
+            var jsonType = new { success = false, result = "" };
+            var jsonResponseContent = await response.Content.ReadAsStringAsync();
+
+            try
             {
-                AuctionModel auction = JsonConvert.DeserializeObject<AuctionModel>(requestContent);
-                if (auction == null)
+                var responseContent = JsonConvert.DeserializeAnonymousType(jsonResponseContent, jsonType);
+                if (responseContent == null)
+                    throw new Exception();
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    Console.WriteLine("Service.HandleRequest(): модель AuctionModel == null!");
+                    Console.WriteLine($"\nЗапрос по адресу {uri} прошёл успешно!");
+                    Console.WriteLine("Полученные данные");
+                    Console.WriteLine(responseContent.result);
+                    //Console.WriteLine();
                 }
-                else
-                {
-                    SetNewDataAsync(auction);
-                    Console.WriteLine("Service.HandleRequest(): полученные данные AuctionModel:");
-                    Console.WriteLine($"{auction.Id}");
-                    Console.WriteLine($"{auction.StartDateTime}");
-                    Console.WriteLine($"{auction.EndDateTime}");
-                    Console.WriteLine($"{auction.EndPayDateTime}");
-                }
-            });
-
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"\nЗапрос по адресу {uri} прошёл неудачно! Код ошибки: {response.StatusCode}");
+                Console.WriteLine("Причина ошибки:");
+                Console.WriteLine(response.ReasonPhrase);
+                Console.WriteLine(e);
+                //Console.WriteLine();
+            }
         }
 
-        private void SetNewDataAsync(AuctionModel auction)
+        /// <summary>
+        /// Обработка запроса от сервера
+        /// </summary>
+        /// <param name="request">Объект запроса</param>
+        /// <returns></returns>
+        public async Task HandleRequest(HttpListenerRequest request)
+        {
+            var reader = new StreamReader(request.InputStream, request.ContentEncoding);
+            string requestContent = await reader.ReadToEndAsync();
+            AuctionModel auction = JsonConvert.DeserializeObject<AuctionModel>(requestContent);
+            if (auction == null)
+            {
+                Console.WriteLine("Service.HandleRequest(): модель AuctionModel == null!");
+                //Console.WriteLine();
+            }
+            else
+            {
+                AddDateTime(auction);
+                Console.WriteLine("Service.HandleRequest(): полученные данные AuctionModel:");
+                Console.WriteLine($"{auction.Id}");
+                Console.WriteLine($"{auction.StartDateTime}");
+                Console.WriteLine($"{auction.EndDateTime}");
+                Console.WriteLine($"{auction.EndPayDateTime}");
+                //Console.WriteLine();
+            }
+        }
+
+        /// <summary>
+        /// Добавление дат и времени в словари
+        /// </summary>
+        /// <param name="auction"></param>
+        protected void AddDateTime(AuctionModel auction)
         {
             if (!StartIds.ContainsKey(auction.StartDateTime))
                 StartIds.Add(auction.StartDateTime, new List<int>());
