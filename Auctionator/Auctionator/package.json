@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "author": "School-command-3",
   "devDependencies": {
-	"@aspnet/signalr": "^1.0.4",
+    "@aspnet/signalr": "^1.0.4",
     "@types/webpack-env": "^1.13.5",
     "aspnet-webpack": "^2.0.3",
     "axios": "^0.18.0",
