@@ -7,6 +7,7 @@ using Auctionator.Data;
 using Auctionator.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.SpaServices.Webpack;
 using Auctionator.Hubs;
 using Microsoft.AspNetCore.Http.Connections;
 using Auctionator.Services.Interface;
@@ -64,6 +65,11 @@ namespace Auctionator
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                app.UseWebpackDevMiddleware(
+                    new WebpackDevMiddlewareOptions
+                    {
+                        HotModuleReplacement = true
+                    });
             }
             else
             {
