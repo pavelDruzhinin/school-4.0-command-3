@@ -8,15 +8,18 @@ namespace WebService.Services
     public class UnitTest : IService
     {
         public string Uri { get; }
+        public string ConnectionUri { get; }
 
         public UnitTest()
         {
-            Uri = "http://localhost:50321/"; // Можно менять на любой другой адрес
-        }
+            Uri = ""; // Адрес самого сервиса
+            ConnectionUri = "http://localhost:50321/"; // Адрес подключения
+        }      
+
         public async void Run()
         {
             // Для GET-запроса (когда данные передавать не нужно)
-            await SendGetRequest(Uri);
+            await SendGetRequest(ConnectionUri);
 
 
             // Для POST-запроса (когда есть данные для передачи)
@@ -27,7 +30,7 @@ namespace WebService.Services
                 Name = "My first product",
                 ShortDescription = "This is a good product"
             };
-            await SendPostRequest(Uri + "test/", dto);
+            await SendPostRequest(ConnectionUri + "test/", dto);
         }
 
         private async Task SendGetRequest(string uri)
