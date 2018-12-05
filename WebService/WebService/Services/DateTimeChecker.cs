@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 using Dapper;
 using Newtonsoft.Json;
 
-namespace WebService
+namespace WebService.Services
 {
-    public class Service : IService
+    public class DateTimeChecker : IService
     {
         public string Uri { get; }
         private readonly string _dbConnectionString;
@@ -27,7 +27,7 @@ namespace WebService
         public SortedDictionary<DateTime, List<int>> EndIds;
         public SortedDictionary<DateTime, List<int>> EndPayIds;
 
-        public Service()
+        public DateTimeChecker()
         {
             // инициализация конфигурации
             Uri = ConfigurationManager.ConnectionStrings["ApplicationUri"].ConnectionString;
@@ -129,8 +129,17 @@ namespace WebService
         protected async Task SendRequestAsync(string uri, IList<int> idList)
         {
             string jsonContent = JsonConvert.SerializeObject(idList); // формиование JSON
-            var response = await Client.RequestPostAsync(uri, jsonContent); // отправка запроса, получение ответа
-            await HandleResponse(uri, response); // обработка ответа
+
+            try
+            {
+                var response = await Client.RequestAsync(uri, jsonContent); // отправка запроса, получение ответа
+                await HandleResponse(uri, response); // обработка ответа
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+                   
         }
 
         /// <summary>
@@ -151,7 +160,7 @@ namespace WebService
                     throw new Exception();
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    Console.WriteLine($"\nЗапрос по адресу {uri} прошёл успешно!");
+                    Console.WriteLine($"\nDateTimeChecker.HandleResponse(): Запрос по адресу {uri} прошёл успешно!");
                     Console.WriteLine("Полученные данные");
                     Console.WriteLine(responseContent.result);
                     //Console.WriteLine();
@@ -159,7 +168,7 @@ namespace WebService
             }
             catch (Exception e)
             {
-                Console.WriteLine($"\nЗапрос по адресу {uri} прошёл неудачно! Код ошибки: {response.StatusCode}");
+                Console.WriteLine($"\nDateTimeChecker.HandleResponse(): Запрос по адресу {uri} прошёл неудачно! Код ошибки: {response.StatusCode}");
                 Console.WriteLine("Причина ошибки:");
                 Console.WriteLine(response.ReasonPhrase);
                 Console.WriteLine(e);
@@ -179,13 +188,13 @@ namespace WebService
             AuctionModel auction = JsonConvert.DeserializeObject<AuctionModel>(requestContent);
             if (auction == null)
             {
-                Console.WriteLine("Service.HandleRequest(): модель AuctionModel == null!");
+                Console.WriteLine("DateTimeChecker.HandleRequest(): модель AuctionModel == null!");
                 //Console.WriteLine();
             }
             else
             {
                 AddDateTime(auction);
-                Console.WriteLine("Service.HandleRequest(): полученные данные AuctionModel:");
+                Console.WriteLine("DateTimeChecker.HandleRequest(): полученные данные AuctionModel:");
                 Console.WriteLine($"{auction.Id}");
                 Console.WriteLine($"{auction.StartDateTime}");
                 Console.WriteLine($"{auction.EndDateTime}");

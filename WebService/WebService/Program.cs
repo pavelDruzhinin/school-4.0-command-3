@@ -20,10 +20,13 @@ namespace WebService
 
         public static void Main(string[] args)
         {
-            var service = new Service();
+            var dateTimeChecker = new Services.DateTimeChecker();
+            var unitTester = new Services.UnitTest();
 
-            Task.Run(() => service.Run()); // запуск сервиса
-            Task.Run(() => Server.ListenAsync(service)); // запуск сервера
+
+            Task.Run(() => dateTimeChecker.Run()); // запуск сервиса проверки дат и времени
+            Task.Run(() => unitTester.Run()); // запуск сервиса юнит-тестов
+            Task.Run(() => Server.ListenAsync(dateTimeChecker)); // запуск сервера
 
             while (true)
             { Thread.Sleep(500); }

@@ -50,7 +50,7 @@ namespace Auctionator.Controllers
             }            
         }
 
-        //TODO: Перенести логику из этого метода в метод Create()
+        //TODO: Перенести логику из этого метода в начало метода Create()
         [Route("test")]
         public async Task Test()
         {
@@ -69,7 +69,10 @@ namespace Auctionator.Controllers
             request.Content = content;
 
             HttpResponseMessage response = await client.SendAsync(request); // отправка запроса и получение ответа
-            //TODO: сделать обработку ответа (запретить добавление нового аукциона)
+            if (!response.IsSuccessStatusCode)
+            {
+                //TODO: сделать обработку неуспешного ответа (запретить создание нового аукциона)
+            }
         }
 
         /// <summary>
