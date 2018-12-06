@@ -17,6 +17,24 @@
             <span class="rub">Р</span>
           </p>
         </span>
+        <div id="timer" class="timer">
+          <Timer
+            starttime="Sep 5, 2019 15:37:25"
+            endtime="Dec 18, 2018 16:37:25"
+            trans='{  
+            "day":"Дни",
+            "hours":"Часы",
+            "minutes":"Минуты",
+            "seconds":"Секунды",
+            "expired":"Аукцион окончен",
+            "running":"До конца аукциона",
+            "upcoming":"До начала аукциона",
+            "status": {
+                "expired":"Expired",
+                "running":"Running",
+                "upcoming":"Future"
+              }}'></Timer>
+        </div>
       </div>
       <!-- add to cart btn -->
       <div class="ecom bg-lblue">
@@ -29,6 +47,7 @@
 
 <script>
 import axios from "axios";
+import Timer from "./Timer.vue";
 
 export default {
   props: ["auction"],
@@ -36,7 +55,8 @@ export default {
     getProduct: function() {
       // keep the link to Vue object
       let that = this;
-      axios.get("/Home/GetProduct")
+      axios
+        .get("/Home/GetProduct")
         .then(response => {
           // handle success
           that.auction.startPrice = response.data.startPrice;
@@ -49,7 +69,8 @@ export default {
           // always executed
         });
     }
-  }
+  },
+  components: { Timer }
 };
 </script>
 
