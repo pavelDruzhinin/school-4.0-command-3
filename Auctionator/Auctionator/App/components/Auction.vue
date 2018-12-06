@@ -1,5 +1,5 @@
 ﻿<template>
-  <div class="col-md-3 col-sm-6">
+  <div class="col-md-4 col-sm-6">
     <!-- Restaurant Item -->
     <div class="item">
       <!-- Item's image -->
