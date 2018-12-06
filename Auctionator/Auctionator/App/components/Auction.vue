@@ -13,7 +13,9 @@
         <!-- price -->
         <span class="price lblue">
           <p>
-            Стартовая цена: {{ auction.startPrice }}
+            <!-- <span v-if="auction.lastBet == '0'">Текущая цена: {{ auction.startPrice }}</span> -->
+            <!-- <span v-else>Текущая цена: {{ auction.lastBet }}</span>             -->
+            <span>{{ currentPrice }}</span>
             <span class="rub">Р</span>
           </p>
         </span>
@@ -50,16 +52,33 @@ import axios from "axios";
 import Timer from "./Timer.vue";
 
 export default {
+  data: function() {
+    return {
+      currentPrice:""
+    }
+  },
   props: ["auction"],
   methods: {
     getProduct: function() {
+      
+    }
+  },
+  components: { Timer },
+  created: function() {
       // keep the link to Vue object
       let that = this;
       axios
-        .get("/Home/GetProduct")
+        .get(`/Home/GetProduct?id=${that.auction.id}`)
         .then(response => {
           // handle success
-          that.auction.startPrice = response.data.startPrice;
+          console.log(response);
+          if(response.data.lastBet == 0) {
+            that.currentPrice = response.data.startPrice;
+          }
+          else {
+            that.currentPrice = response.data.lastBet;
+          }
+          console.log(that);
         })
         .catch(error => {
           // handle error
@@ -68,9 +87,7 @@ export default {
         .then(() => {
           // always executed
         });
-    }
-  },
-  components: { Timer }
+  }
 };
 </script>
 
