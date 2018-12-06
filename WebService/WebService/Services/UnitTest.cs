@@ -19,7 +19,7 @@ namespace WebService.Services
         public async void Run()
         {
             // Для GET-запроса (когда данные передавать не нужно)
-            await SendGetRequest(ConnectionUri);
+            await SendGetRequest(ConnectionUri + "product/1"); 
 
 
             // Для POST-запроса (когда есть данные для передачи)
@@ -30,7 +30,7 @@ namespace WebService.Services
                 Name = "My first product",
                 ShortDescription = "This is a good product"
             };
-            await SendPostRequest(ConnectionUri + "test/", dto);
+            await SendPostRequest(ConnectionUri + "product/add", dto);
         }
 
         private async Task SendGetRequest(string uri)
@@ -41,6 +41,9 @@ namespace WebService.Services
                 if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine($"\nUnitTest.SendGetRequest(): GET-запрос по адресу {uri} прошёл успешно!");
+                    Console.WriteLine("Полученные данные:");
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(responseContent);
                 }
                 else
                 {
@@ -64,6 +67,10 @@ namespace WebService.Services
                 {
                     Console.WriteLine($"\nUnitTest.SendPostRequest(): POST-запрос по адресу {uri} прошёл успешно!");
                     Console.WriteLine($"Переданные данные: {jsonContent}");
+
+                    Console.WriteLine("Полученные данные:");
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(responseContent);
                 }
                 else
                 {
