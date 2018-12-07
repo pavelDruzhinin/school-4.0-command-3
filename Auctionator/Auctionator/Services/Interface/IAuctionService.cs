@@ -15,5 +15,10 @@ namespace Auctionator.Services.Interface
         Task<Auction> Update(AuctionDto auctionDto, int id);
         Task<Bet> AddBet(BetDto betDto);
         Task<List<Bet>> GetAllBets(int auctionId);
+        void Activate(IList<int> auctionId);
+        void Complete(IList<int> auctionId);
+        void EndPayTime(IList<int> auctionId);
+        Task<Auction> PayedProduct(int auctionId);
+        Task<List<Auction>> NotPayed(string userId);
     }
 }
