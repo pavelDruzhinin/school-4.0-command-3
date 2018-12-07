@@ -71,14 +71,12 @@ export default {
         .get(`/Home/GetProduct?id=${that.auction.id}`)
         .then(response => {
           // handle success
-          console.log(response);
           if(response.data.lastBet == 0) {
             that.currentPrice = response.data.startPrice;
           }
           else {
             that.currentPrice = response.data.lastBet;
           }
-          console.log(that);
         })
         .catch(error => {
           // handle error
@@ -93,7 +91,7 @@ export default {
 
 <style lang="scss">
 .rub {
-  line-height: 11px;
+  line-height: 8px;
   width: 0.4em;
   border-bottom: 1px solid #000;
   display: inline-block;
