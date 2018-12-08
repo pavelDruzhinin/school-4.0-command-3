@@ -27,9 +27,7 @@ namespace Auctionator.Services.Implementation
                 Photos = productDto.Photos,
                 Description = productDto.Description,
                 ShortDescription = productDto.ShortDescription,
-                Status = productDto.Status,
-                AuctionId = productDto.AuctionId,
-                OwnerId = productDto.OwnerId
+                Status = Enums.ProductStatus.WaitAuction,
                 
             };
 

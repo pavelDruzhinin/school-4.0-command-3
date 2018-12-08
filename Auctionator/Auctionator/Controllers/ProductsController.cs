@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Auctionator.Hubs;
 using Auctionator.Models.Dtos;
@@ -29,6 +30,7 @@ namespace Auctionator.Controllers
             try
             {
                 var prod = await _productService.Create(productDto);
+                prod.OwnerId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 return Json(new { success = true, result = prod });
             }
             catch (Exception ex)
