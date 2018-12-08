@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Auctionator.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181204133405_products-0.1")]
-    partial class products01
+    [Migration("20181208125737_auction-0.9")]
+    partial class auction09
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -59,6 +59,8 @@ namespace Auctionator.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AuctionId");
+
+                    b.Property<DateTime>("BetDateTime");
 
                     b.Property<double>("CurrentBet");
 
@@ -134,8 +136,6 @@ namespace Auctionator.Data.Migrations
                     b.Property<string>("UserId");
 
                     b.Property<int>("ProductId");
-
-                    b.Property<int>("Id");
 
                     b.HasKey("UserId", "ProductId");
 

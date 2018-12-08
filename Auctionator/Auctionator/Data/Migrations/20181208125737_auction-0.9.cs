@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Auctionator.Data.Migrations
 {
@@ -6,18 +7,18 @@ namespace Auctionator.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<double>(
-                name: "Price",
-                table: "Products",
-                nullable: true,
-                oldClrType: typeof(double));
-
             migrationBuilder.AlterColumn<string>(
                 name: "Path",
                 table: "ProductPhotos",
                 nullable: false,
                 oldClrType: typeof(string),
                 oldNullable: true);
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "BetDateTime",
+                table: "Bets",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
             migrationBuilder.AddColumn<double>(
                 name: "LastBet",
@@ -34,19 +35,16 @@ namespace Auctionator.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
+                name: "BetDateTime",
+                table: "Bets");
+
+            migrationBuilder.DropColumn(
                 name: "LastBet",
                 table: "Auctions");
 
             migrationBuilder.DropColumn(
                 name: "PaidStatus",
                 table: "Auctions");
-
-            migrationBuilder.AlterColumn<double>(
-                name: "Price",
-                table: "Products",
-                nullable: false,
-                oldClrType: typeof(double),
-                oldNullable: true);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Path",

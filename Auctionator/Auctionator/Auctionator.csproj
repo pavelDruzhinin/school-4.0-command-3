@@ -10,6 +10,12 @@
     <Compile Remove="Data\Migrations\20181127231811_auction-0.5.Designer.cs" />
     <Compile Remove="Data\Migrations\20181130234725_auction-0.9.cs" />
     <Compile Remove="Data\Migrations\20181130234725_auction-0.9.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181201150739_auction-0.9.cs" />
+    <Compile Remove="Data\Migrations\20181201150739_auction-0.9.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181204133405_products-0.1.cs" />
+    <Compile Remove="Data\Migrations\20181204133405_products-0.1.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181208124929_auction-0.9.1.cs" />
+    <Compile Remove="Data\Migrations\20181208124929_auction-0.9.1.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

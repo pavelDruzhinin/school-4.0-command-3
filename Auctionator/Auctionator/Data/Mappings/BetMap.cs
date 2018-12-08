@@ -15,6 +15,7 @@ namespace Auctionator.Data.Mappings
             builder.HasKey(x => x.Id);
             builder.Property(x => x.CurrentBet).IsRequired();
             builder.Property(x => x.UserId).IsRequired();
+            builder.Property(x => x.BetDateTime).IsRequired();
 
             builder.HasOne(x => x.Auction).WithMany(x => x.Bets).HasForeignKey(x => x.AuctionId);
             builder.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);

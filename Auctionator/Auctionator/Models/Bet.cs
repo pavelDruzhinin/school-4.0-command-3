@@ -9,6 +9,7 @@ namespace Auctionator.Models
     {
         public int Id { get; set; }
         public double CurrentBet { get; set; }
+        public DateTime BetDateTime { get; set; }
         public string UserId { get; set; }
         public User User { get; set; }
         public int AuctionId { get; set; }
