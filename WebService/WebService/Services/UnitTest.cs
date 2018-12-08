@@ -41,9 +41,9 @@ namespace WebService.Services
                 if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine($"\nUnitTest.SendGetRequest(): GET-запрос по адресу {uri} прошёл успешно!");
-                    Console.WriteLine("Полученные данные:");
-                    string responseContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(responseContent);
+                    //Console.WriteLine("Полученные данные:");
+                    //string responseContent = await response.Content.ReadAsStringAsync();
+                    //Console.WriteLine(responseContent);
                 }
                 else
                 {
@@ -68,9 +68,9 @@ namespace WebService.Services
                     Console.WriteLine($"\nUnitTest.SendPostRequest(): POST-запрос по адресу {uri} прошёл успешно!");
                     Console.WriteLine($"Переданные данные: {jsonContent}");
 
-                    Console.WriteLine("Полученные данные:");
-                    string responseContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(responseContent);
+                    //Console.WriteLine("Полученные данные:");
+                    //string responseContent = await response.Content.ReadAsStringAsync();
+                    //Console.WriteLine(responseContent);
                 }
                 else
                 {
