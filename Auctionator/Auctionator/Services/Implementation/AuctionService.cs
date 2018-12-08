@@ -94,6 +94,7 @@ namespace Auctionator.Services.Implementation
             return newBet;
         }
 
+        // TODO: поменять все void на async Task, добавить await, где нужно
         public void Activate(IList<int> auctionId)
         {
             // старт аукциона (/auction/start) (StartAuctions(IList<int> auctionIds))

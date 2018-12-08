@@ -10,12 +10,11 @@ using Newtonsoft.Json.Linq;
 namespace Auctionator.Controllers
 {
     public class HomeController : Controller
-    {
+    {        
         public IActionResult Index()
         {
             return View();
         }
-
         public JsonResult GetProduct()
         {
             var id = this.Request.Query["id"];

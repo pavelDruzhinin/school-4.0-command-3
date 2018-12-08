@@ -32,7 +32,7 @@ namespace Auctionator.Controllers
         /// <param name="auctionId">список Id запускаемых аукционов</param>
         /// <returns></returns>
         [HttpPost]
-        [Route("start")]
+        [Route("start")] // TODO: поменять все JsonResult на async Task<JsonResult>, добавить await, где нужно
         public JsonResult StartAuctions([FromBody] List<int> auctionId)
         {
             try

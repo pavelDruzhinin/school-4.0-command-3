@@ -13,6 +13,9 @@ namespace Auctionator.Data.Mappings
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Email).IsRequired();
+            builder.Property(x => x.Password).IsRequired();
+            builder.Property(x => x.Name).IsRequired();
             builder.HasMany<Product>(x => x.BoughtProducts).WithOne(x => x.Buyer).HasForeignKey(x => x.BuyerId);
             builder.HasMany<Product>(x => x.OwnProducts).WithOne(x => x.Owner).HasForeignKey(x => x.OwnerId);
             builder.HasMany<Auction>(x => x.WonAuctions).WithOne(x => x.Winner).HasForeignKey(x => x.WinnerId);

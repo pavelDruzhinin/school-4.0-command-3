@@ -12,6 +12,7 @@ using Auctionator.Hubs;
 using Microsoft.AspNetCore.Http.Connections;
 using Auctionator.Services.Interface;
 using Auctionator.Services.Implementation;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Auctionator
 {
@@ -36,8 +37,13 @@ namespace Auctionator
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<User>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            // Подключение сервиса аутентификации
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => //CookieAuthenticationOptions
+                {
+                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/user/login");
+                });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
