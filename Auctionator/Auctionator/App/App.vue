@@ -1,8 +1,8 @@
 ﻿<template>
   <div class="shop-items">
 			<div class="container-fluid">
-        <div class="row" v-for="i in Math.ceil(auctions.length / 4)">
-          <auction v-for="auction in auctions.slice((i-1) * 4, i * 4)" :key="auction.id" :auction="auction"></auction>
+        <div class="row" v-for="i in Math.ceil(auctions.length / 3)">
+          <auction v-for="auction in auctions.slice((i-1) * 3, i * 3)" :key="auction.id" :auction="auction"></auction>
         </div>
       </div>    
   </div>

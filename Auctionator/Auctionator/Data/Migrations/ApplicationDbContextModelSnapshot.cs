@@ -58,6 +58,8 @@ namespace Auctionator.Data.Migrations
 
                     b.Property<int>("AuctionId");
 
+                    b.Property<DateTime>("BetDateTime");
+
                     b.Property<double>("CurrentBet");
 
                     b.Property<string>("UserId")
@@ -89,7 +91,7 @@ namespace Auctionator.Data.Migrations
 
                     b.Property<string>("OwnerId");
 
-                    b.Property<double?>("Price");
+                    b.Property<double>("Price");
 
                     b.Property<string>("ShortDescription");
 

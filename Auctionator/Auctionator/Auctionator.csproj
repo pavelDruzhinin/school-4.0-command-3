@@ -10,6 +10,12 @@
     <Compile Remove="Data\Migrations\20181127231811_auction-0.5.Designer.cs" />
     <Compile Remove="Data\Migrations\20181130234725_auction-0.9.cs" />
     <Compile Remove="Data\Migrations\20181130234725_auction-0.9.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181201150739_auction-0.9.cs" />
+    <Compile Remove="Data\Migrations\20181201150739_auction-0.9.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181204133405_products-0.1.cs" />
+    <Compile Remove="Data\Migrations\20181204133405_products-0.1.Designer.cs" />
+    <Compile Remove="Data\Migrations\20181208124929_auction-0.9.1.cs" />
+    <Compile Remove="Data\Migrations\20181208124929_auction-0.9.1.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +29,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" PrivateAssets="All" />
+    <PackageReference Include="Node.js" Version="5.3.0" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 ﻿<template>
-  <div class="col-md-3 col-sm-6">
+  <div class="col-md-4 col-sm-6">
     <!-- Restaurant Item -->
     <div class="item">
       <!-- Item's image -->
@@ -13,10 +13,30 @@
         <!-- price -->
         <span class="price lblue">
           <p>
-            Стартовая цена: {{ auction.startPrice }}
+            <!-- <span v-if="auction.lastBet == '0'">Текущая цена: {{ auction.startPrice }}</span> -->
+            <!-- <span v-else>Текущая цена: {{ auction.lastBet }}</span>             -->
+            <span>{{ currentPrice }}</span>
             <span class="rub">Р</span>
           </p>
         </span>
+        <div id="timer" class="timer">
+          <Timer
+            starttime="Sep 5, 2019 15:37:25"
+            endtime="Dec 18, 2018 16:37:25"
+            trans='{  
+            "day":"Дни",
+            "hours":"Часы",
+            "minutes":"Минуты",
+            "seconds":"Секунды",
+            "expired":"Аукцион окончен",
+            "running":"До конца аукциона",
+            "upcoming":"До начала аукциона",
+            "status": {
+                "expired":"Expired",
+                "running":"Running",
+                "upcoming":"Future"
+              }}'></Timer>
+        </div>
       </div>
       <!-- add to cart btn -->
       <div class="ecom bg-lblue">
@@ -29,17 +49,34 @@
 
 <script>
 import axios from "axios";
+import Timer from "./Timer.vue";
 
 export default {
+  data: function() {
+    return {
+      currentPrice:""
+    }
+  },
   props: ["auction"],
   methods: {
     getProduct: function() {
+      
+    }
+  },
+  components: { Timer },
+  created: function() {
       // keep the link to Vue object
       let that = this;
-      axios.get("/Home/GetProduct")
+      axios
+        .get(`/Home/GetProduct?id=${that.auction.id}`)
         .then(response => {
           // handle success
-          that.auction.startPrice = response.data.startPrice;
+          if(response.data.lastBet == 0) {
+            that.currentPrice = response.data.startPrice;
+          }
+          else {
+            that.currentPrice = response.data.lastBet;
+          }
         })
         .catch(error => {
           // handle error
@@ -48,14 +85,13 @@ export default {
         .then(() => {
           // always executed
         });
-    }
   }
 };
 </script>
 
 <style lang="scss">
 .rub {
-  line-height: 11px;
+  line-height: 8px;
   width: 0.4em;
   border-bottom: 1px solid #000;
   display: inline-block;
