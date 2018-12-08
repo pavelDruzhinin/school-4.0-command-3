@@ -30,7 +30,7 @@ namespace Auctionator.Controllers
             try
             {
                 var prod = await _productService.Create(productDto);
-                prod.OwnerId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                prod.OwnerId = User.Identity.Name;
                 return Json(new { success = true, result = prod });
             }
             catch (Exception ex)
