@@ -18,13 +18,44 @@ namespace Auctionator.Controllers
 
         public JsonResult GetProduct()
         {
-            string jsonData = @"{  
+            var id = this.Request.Query["id"];
+            string jsonData;
+            switch (id)
+            {
+                case "1":
+                    jsonData = @"{  
                 'startPrice':'234',  
-                'startDate':'12.12.2019'  
-            }";
+                'startDate':'12.12.2018',
+                'lastBet':'1234567'
+                }";
+                    break;
+
+                case "2":
+                    jsonData = @"{  
+                'startPrice':'23124',  
+                'startDate':'1.12.2018',
+                'lastBet':'0'
+                }";
+                    break;
+
+                case "3":
+                    jsonData = @"{  
+                'startPrice':'111',  
+                'startDate':'08.12.2018',
+                'lastBet':'111111111'
+                }";
+                    break;
+                default:
+                    jsonData = @"{  
+                'startPrice':'90',  
+                'startDate':'22.12.2018',
+                'lastBet':'0'
+                }";
+                    break;
+            }
 
             var details = JObject.Parse(jsonData);
-
+            
             return Json(details);
         }
 
