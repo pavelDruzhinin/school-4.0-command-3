@@ -93,5 +93,44 @@ namespace Auctionator.Services.Implementation
 
             return newBet;
         }
+
+        public void Activate(IList<int> auctionId)
+        {
+            // старт аукциона (/auction/start) (StartAuctions(IList<int> auctionIds))
+            _db.Auctions.Where(x => x.Status == Enums.AuctionStatus.Wait).Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => x.Status = Enums.AuctionStatus.Active);
+            _db.SaveChangesAsync();
+        }
+
+        public void Complete(IList<int> auctionId)
+        {
+            // завершение аукциона (/auction/end) (EndAuctions(IList<int> auctionIds))
+            _db.Auctions.Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => x.Status = Enums.AuctionStatus.Completed);
+            _db.SaveChangesAsync();
+        }
+
+        public void EndPayTime(IList<int> auctionId)
+        {
+            // завершение срока оплаты товара(/auction/end-payment) (EndPayments(IList<int> auctionIds))
+            _db.Auctions.Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => { x.PaidStatus = Enums.PaidStatus.NotPaid; x.Status = Enums.AuctionStatus.Failed; });
+            _db.SaveChangesAsync();
+        }
+
+        public async Task<Auction> PayedProduct(int productId)
+        {
+            var auction = await _db.Auctions.FirstOrDefaultAsync(x => x.Id == productId);
+
+            _db.Auctions.Attach(auction);
+
+            auction.PaidStatus = Enums.PaidStatus.Paid;
+
+            await _db.SaveChangesAsync();
+
+            return auction;
+        }
+
+        public async Task<List<Auction>> NotPayed(string userId)
+        {
+            return await _db.Auctions.Where(x => x.WinnerId == userId).Where(x => x.PaidStatus == Enums.PaidStatus.NotPaid).ToListAsync();
+        }
     }
 }

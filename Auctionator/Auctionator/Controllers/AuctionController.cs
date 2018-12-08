@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Auctionator.Hubs;
 using Auctionator.Models.Dtos;
@@ -20,6 +24,92 @@ namespace Auctionator.Controllers
         {
             _hubContext = hubContext;
             _auctionService = auctionService;
+        }
+
+        /// <summary>
+        /// запуск аукционов
+        /// </summary>
+        /// <param name="auctionId">список Id запускаемых аукционов</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("start")]
+        public JsonResult StartAuctions([FromBody] List<int> auctionId)
+        {
+            try
+            {
+                _auctionService.Activate(auctionId);
+                return Json(new { success = true, status = HttpStatusCode.OK });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Завершение аукционов
+        /// </summary>
+        /// <param name="auctionId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("end")]
+        public JsonResult EndAuctions([FromBody] List<int> auctionId)
+        {
+            try
+            {
+                _auctionService.Complete(auctionId);
+                return Json(new { success = true, status = HttpStatusCode.OK });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Завершение срока оплаты
+        /// </summary>
+        /// <param name="auctionId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("end-payment")]
+        public JsonResult EndPayments([FromBody] List<int> auctionId)
+        {
+            try
+            {
+                _auctionService.EndPayTime(auctionId);
+                return Json(new { success = true, status = HttpStatusCode.OK });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
+        }
+
+        //TODO: Перенести логику из этого метода в начало метода Create()
+        [Route("test")]
+        public async Task Test()
+        {
+            HttpClient client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage
+            {
+                RequestUri = new Uri("http://localhost:8888/"), //TODO: добавить в конфигурацию и достать оттуда URI
+                Method = HttpMethod.Post
+            };
+            request.Headers.Add("Accept", "application/json");
+
+            var auction = await _auctionService.GetAuctionById(12);
+            var auc = new {auction.Id, auction.StartDateTime, auction.EndDateTime, auction.EndPayDateTime};
+            var jsonRequestContent = JsonConvert.SerializeObject(auc);
+
+            HttpContent content = new StringContent(jsonRequestContent, Encoding.UTF8, "application/json");
+            request.Content = content;
+
+            HttpResponseMessage response = await client.SendAsync(request); // отправка запроса и получение ответа
+            if (!response.IsSuccessStatusCode)
+            {
+                //TODO: сделать обработку неуспешного ответа (запретить создание нового аукциона)
+            }
         }
 
         /// <summary>
@@ -106,12 +196,36 @@ namespace Auctionator.Controllers
         [Route("create")]
         public async Task<JsonResult> Create(string auction)
         {
-            AuctionDto auctionDto = JsonConvert.DeserializeObject<AuctionDto>(auction, new IsoDateTimeConverter { DateTimeFormat = "dd.MM.yyyy HH:mm:ss" }); 
+            AuctionDto auctionDto = JsonConvert.DeserializeObject<AuctionDto>(auction, new IsoDateTimeConverter { DateTimeFormat = "dd.MM.yyyy HH:mm:ss" });
 
             try
             {
                 var auc = await _auctionService.Create(auctionDto);
-                return Json(new { success = true, result = auc });
+
+                HttpClient client = new HttpClient();
+                HttpRequestMessage request = new HttpRequestMessage
+                {
+                    RequestUri = new Uri("http://localhost:8888/"), //TODO: добавить в конфигурацию и достать оттуда URI
+                    Method = HttpMethod.Post
+                };
+
+                request.Headers.Add("Accept", "application/json");
+
+                var aucContent = new { auc.Id, auc.StartDateTime, auc.EndDateTime, auc.EndPayDateTime };
+                var jsonRequestContent = JsonConvert.SerializeObject(aucContent);
+
+                HttpContent content = new StringContent(jsonRequestContent, Encoding.UTF8, "application/json");
+                request.Content = content;
+
+                HttpResponseMessage response = await client.SendAsync(request); // отправка запроса и получение ответа
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Json(new { response = true, success = true, result = auc });
+                } else
+                {
+                    return Json(new { response = false, success = true, result = auc });
+                }
             }
             catch (Exception ex)
             {
@@ -176,6 +290,36 @@ namespace Auctionator.Controllers
             {
                 var bets = await _auctionService.GetAllBets(auctionId);
                 return Json(new { success = true, result = bets });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
+        }
+
+        public async Task<JsonResult> PayProduct(int auctionId)
+        {
+            try
+            {
+                var product = await _auctionService.PayedProduct(auctionId);
+                return Json(new { success = true, result = product });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// вывод списка аукционов, ожидающих оплату после выигранного аукциона
+        /// </summary>
+        /// <returns></returns>
+        public async Task<JsonResult> NotPayed(string userId)
+        {
+            try
+            {
+                var auctions = await _auctionService.NotPayed(userId);
+                return Json(new { success = true, result = auctions });
             }
             catch (Exception ex)
             {
