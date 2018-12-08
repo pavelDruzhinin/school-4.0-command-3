@@ -13,7 +13,6 @@ using Newtonsoft.Json.Converters;
 
 namespace Auctionator.Controllers
 {
-    [Route("user")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
