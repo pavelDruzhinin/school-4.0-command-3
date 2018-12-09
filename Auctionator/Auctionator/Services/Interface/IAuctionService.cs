@@ -13,12 +13,13 @@ namespace Auctionator.Services.Interface
         Task<List<Auction>> GetAuctionsForMainPage(int count);
         Task<Auction> Create(AuctionDto auctionDto);
         Task<Auction> Update(AuctionDto auctionDto, int id);
+        Task<Auction> Delete(int id);
         Task<Bet> AddBet(BetDto betDto);
         Task<List<Bet>> GetAllBets(int auctionId);
-        void Activate(IList<int> auctionId);
-        void Complete(IList<int> auctionId);
-        void EndPayTime(IList<int> auctionId);
-        Task<Auction> PayedProduct(int auctionId);
+        Task Activate(IList<int> auctionId);
+        Task Complete(IList<int> auctionId);
+        Task EndPayTime(IList<int> auctionId);
+        Task<Auction> Pay(int auctionId);
         Task<List<Auction>> NotPayed(string userId);
     }
 }

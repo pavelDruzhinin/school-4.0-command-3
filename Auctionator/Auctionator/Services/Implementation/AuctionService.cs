@@ -12,10 +12,12 @@ namespace Auctionator.Services.Implementation
     public class AuctionService : IAuctionService
     {
         private readonly ApplicationDbContext _db;
+        private readonly IProductService _productService;
 
-        public AuctionService(ApplicationDbContext db)
+        public AuctionService(ApplicationDbContext db, IProductService productService)
         {
             _db = db;
+            _productService = productService;
         }
 
         public async Task<List<Auction>> GetAll(Enums.AuctionStatus status)
@@ -43,7 +45,8 @@ namespace Auctionator.Services.Implementation
         public async Task<Auction> Create(AuctionDto auctionDto)
         {
             var newAuction = new Auction() {
-                Status = auctionDto.StartDateTime > System.DateTime.Now ? Enums.AuctionStatus.Wait : Enums.AuctionStatus.Active,
+                Status = Enums.AuctionStatus.Wait,
+                PaidStatus = Enums.PaidStatus.NotPaid,
                 StartDateTime = auctionDto.StartDateTime,
                 EndDateTime = auctionDto.StartDateTime.AddDays(3), // 3 дня на аукцион
                 StartPrice = auctionDto.StartPrice,
@@ -72,6 +75,18 @@ namespace Auctionator.Services.Implementation
             return auc;
         }
 
+        public async Task<Auction> Delete(int id)
+        {
+            var auc = await GetAuctionById(id);
+            _db.Auctions.Attach(auc);
+
+            auc.Status = Enums.AuctionStatus.Failed;
+
+            await _db.SaveChangesAsync();
+
+            return auc;
+        }
+
         public async Task<List<Bet>> GetAllBets(int auctionId)
         {
             return await _db.Bets.Where(x => x.AuctionId == auctionId).OrderByDescending(x => x.Id).ToListAsync();
@@ -94,36 +109,41 @@ namespace Auctionator.Services.Implementation
             return newBet;
         }
 
-        public void Activate(IList<int> auctionId)
+        public async Task Activate(IList<int> auctionId)
         {
             // старт аукциона (/auction/start) (StartAuctions(IList<int> auctionIds))
-            _db.Auctions.Where(x => x.Status == Enums.AuctionStatus.Wait).Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => x.Status = Enums.AuctionStatus.Active);
-            _db.SaveChangesAsync();
+            _db.Auctions.Include(x => x.Product).Where(x => x.Status == Enums.AuctionStatus.Wait).Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => { x.Status = Enums.AuctionStatus.Active; x.Product.Status = Enums.ProductStatus.OnAuction; });
+            await _db.SaveChangesAsync();
         }
 
-        public void Complete(IList<int> auctionId)
+        public async Task Complete(IList<int> auctionId)
         {
             // завершение аукциона (/auction/end) (EndAuctions(IList<int> auctionIds))
-            _db.Auctions.Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => x.Status = Enums.AuctionStatus.Completed);
-            _db.SaveChangesAsync();
+            _db.Auctions.Include(x => x.Product).Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => { x.Status = string.IsNullOrEmpty(x.WinnerId) ? Enums.AuctionStatus.Failed : Enums.AuctionStatus.OnPayment; x.Product.Status = string.IsNullOrEmpty(x.WinnerId) ? Enums.ProductStatus.WaitAuction : Enums.ProductStatus.OnPayment; });
+            await _db.SaveChangesAsync();
         }
 
-        public void EndPayTime(IList<int> auctionId)
+        public async Task EndPayTime(IList<int> auctionId)
         {
             // завершение срока оплаты товара(/auction/end-payment) (EndPayments(IList<int> auctionIds))
-            _db.Auctions.Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => { x.PaidStatus = Enums.PaidStatus.NotPaid; x.Status = Enums.AuctionStatus.Failed; });
-            _db.SaveChangesAsync();
+            _db.Auctions.Include(x => x.Product).Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => { x.PaidStatus = Enums.PaidStatus.NotPaid; x.Status = Enums.AuctionStatus.Failed; x.Product.Status = Enums.ProductStatus.WaitAuction; });
+            await _db.SaveChangesAsync();
         }
 
-        public async Task<Auction> PayedProduct(int productId)
+        public async Task<Auction> Pay(int id)
         {
-            var auction = await _db.Auctions.FirstOrDefaultAsync(x => x.Id == productId);
+            var auction = await _db.Auctions.Include(x => x.Product).FirstOrDefaultAsync(x => x.Id == id && x.Status == Enums.AuctionStatus.OnPayment);
+            if (auction != null)
+            {
+                _db.Auctions.Attach(auction);
 
-            _db.Auctions.Attach(auction);
+                auction.Status = Enums.AuctionStatus.Completed;
+                auction.PaidStatus = Enums.PaidStatus.Paid;
+                auction.Product.Status = Enums.ProductStatus.Paid;
 
-            auction.PaidStatus = Enums.PaidStatus.Paid;
+                await _db.SaveChangesAsync();
 
-            await _db.SaveChangesAsync();
+            }
 
             return auction;
         }
