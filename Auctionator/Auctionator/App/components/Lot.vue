@@ -58,7 +58,25 @@
       <div class="card">
         <span class="badge badge-info">
           <h3>Bidding list</h3>
-        </span>
+        </span>        
+        <div class="card-body">
+          <div class="input-group">
+            <input
+              type="number"
+              class="form-control"
+              placeholder="Ваша ставка"
+              aria-label="Ваша ставка"
+              aria-describedby="button-addition"
+            >
+            <div class="input-group-append">
+              <button
+                class="btn btn-outline-primary"
+                type="button"
+                id="button-addition"
+              >Сделать ставку</button>
+            </div>
+          </div>
+        </div>
         <div class="card-body">
           <table class="table table-borderless">
             <thead>
@@ -99,24 +117,6 @@
               </tr>
             </tbody>
           </table>
-        </div>
-        <div class="card-body">
-          <div class="input-group">
-            <input
-              type="number"
-              class="form-control"
-              placeholder="Ваша ставка"
-              aria-label="Ваша ставка"
-              aria-describedby="button-addition"
-            >
-            <div class="input-group-append">
-              <button
-                class="btn btn-outline-primary"
-                type="button"
-                id="button-addition"
-              >Сделать ставку</button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
