@@ -26,7 +26,10 @@ namespace Auctionator
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // регистрация сервисов
             services.AddScoped<IAuctionService, AuctionService>();
+            services.AddScoped<IProductService, ProductService>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;
