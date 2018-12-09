@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices.ComTypes;
+﻿using System;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Auctionator.Data;
 using Auctionator.Models;
@@ -27,7 +28,9 @@ namespace Auctionator.Services.Implementation
 
         public async Task<User> GetUser(string email)
         {
-            return await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
+            User user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var a = user;
+            return user;
         }
 
         public async Task<User> GetUser(string email, string password)

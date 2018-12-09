@@ -39,20 +39,19 @@ namespace Auctionator.Controllers
         }
 
 
-        [ValidateAntiForgeryToken]
         [HttpPost]
         [Route("register")]
-        public async Task<JsonResult> Register([FromBody]string userData)
+        public async Task<JsonResult> Register([FromBody]UserDto userDto)
         {
-            UserDto userDto = JsonConvert.DeserializeObject<UserDto>(userData);
             try
             {
-                if (_userService.GetUser(userDto.Email) != null) // Проверка, существует ли пользователь с таким Email-ом
+                //UserDto userDto = JsonConvert.DeserializeObject<UserDto>(userData);
+                if (await _userService.GetUser(userDto.Email) != null) // Проверка, существует ли пользователь с таким Email-ом
                     throw new Exception("Пользователь с таким E-mail адресом уже существует!");
 
                 var user = await _userService.AddUserAsync(userDto); // добавление пользователя в БД
                 await Authenticate(user.Id, user.Email, user.Name); // аутентификация пользователя, создание Cookie для него
-                return Json(new { success = true });
+                return Json(new { success = true, result = "" });
             }
             catch (Exception ex)
             {
@@ -61,13 +60,13 @@ namespace Auctionator.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         [Route("login")]
         public async Task<JsonResult> Login(string userData)
         {
-            UserDto userDto = JsonConvert.DeserializeObject<UserDto>(userData);
             try
             {
+                UserDto userDto = JsonConvert.DeserializeObject<UserDto>(userData);
+
                 var user = await _userService.GetUser(userDto.Email, userDto.Password);
                 if (user == null)
                     throw new Exception("Неправильный E-mail или пароль!");

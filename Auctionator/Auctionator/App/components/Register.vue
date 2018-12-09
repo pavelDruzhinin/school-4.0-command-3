@@ -8,23 +8,24 @@
                         <div class="form-group has-error">
                             <input class="form-control input-lg" placeholder="Введите E-mail" v-model="user.email" autofocus="" type="email">
                             <p v-show="!validation.email" class="text-danger">Неверно введён E-mail.</p>
-                            <p v-show="!validation.emailNotEmpty" class="text-danger">emptyFieldError</p>
                         </div>
                         <div class="form-group has-success">
                             <input class="form-control input-lg" placeholder="Введите пароль" v-model="user.password" type="password">
-                            <p v-show="!validation.passwordNotEmpty" class="text-danger">emptyFieldError</p>
+                            <p v-show="!validation.passwordLength" class="text-danger">{{passLengthMsg}}</p>
                         </div>
                         <div class="form-group has-success">
-                            <input class="form-control input-lg" placeholder="Повторите пароль" v-model="user.confirmPassword" type="password">
+                            <input class="form-control input-lg" placeholder="Повторите пароль" v-model="confirmPassword" type="password">
                             <p v-show="!validation.confirmPassword" class="text-danger">Пароли не совпадают.</p>
-                            <p v-show="!validation.confirmPasswordNotEmpty" class="text-danger">emptyFieldError</p>
                         </div>
                         <div class="form-group">
                             <input class="form-control input-lg" placeholder="Введите Ваше имя" v-model="user.name" type="text">
-                            <p v-show="!validation.name" class="text-danger">Имя может содержать только буквы.</p>
-                            <p v-show="!validation.nameNotEmpty" class="text-danger">emptyFieldError</p>
+                            <p v-show="!validation.nameNotEmpty" class="text-danger">{{emptyMsg}}</p>
                         </div>
-                        <input v-on:click="handleSubmit" class="btn btn-lg btn-primary btn-block" value="Зарегистрироваться" type="submit">
+                        <div v-if="isResponseMsg" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{responseMsg}}
+                        </div>
+                        <input v-if="isValid" v-on:click="handleSubmit" class="btn btn-lg btn-primary btn-block" value="Зарегистрироваться" type="submit">
+                        <input v-else class="btn btn-lg btn-danger btn-block" value="Зарегистрироваться" type="submit" disabled>
                     </fieldset>
                 </div>
             </div>
@@ -45,10 +46,12 @@
                     user: {
                         email: '',
                         password: '',
-                        confirmPassword: '',
                         name: ''
                     },
-                    emptyFieldError: 'Поле не может быть пустым.'
+                    confirmPassword: '',
+                    emptyMsg: 'Поле не должно быть пустым.',
+                    passLengthMsg: 'Пароль не должен быть короче 6 символов',
+                    responseMsg: ''
                 }            
         },
         // computed property for form validation state
@@ -56,11 +59,10 @@
             validation: function () {
                 return {
                     email: emailRE.test(this.user.email),
-                    confirmPassword: this.user.password == this.user.confirmPassword ? true : false,
-                    nameNotEmpty: !!this.user.name.trim(),
-                    emailNotEmpty: !!this.user.email.trim(),
-                    passwordNotEmpty: !!this.user.password.trim(),
-                    confirmPasswordNotEmpty: !!this.user.confirmPassword.trim(),
+                    nameNotEmpty: this.user.name === '' ? false : true,
+                    passwordNotEmpty: this.user.password === '' ? false : true,
+                    confirmPassword: this.user.password === this.confirmPassword ? true : false,
+                    passwordLength: this.user.password.length > 5 ? true : false
                 }
             },
             isValid: function () {
@@ -68,25 +70,30 @@
                 return Object.keys(validation).every(function (key) {
                     return validation[key]
                 })
+            },
+            isResponseMsg: function () {
+                return this.responseMsg === '' ? false : true
             }
         },
         // methods
         methods: {
             handleSubmit: function () {
-                //if (this.isValid) {
-                    axios.post('/user/register', {
-                        email: this.user.email,
-                        password: this.user.password,
-                        name: this.user.name
-                        },
+                if (this.isValid) {
+                    axios.post('/register', this.user,
                         { withCredentials: true })
                     .then(response => {
                         console.log(response)
+                        this.responseMsg = response.data.result
+                        if (response.data.success === true) {
+                            alert('Вы были успешно зарегистрированы и авторизованы!')
+                            this.$router.push('/')
+                        }
                     })
                     .catch(error => {
+                        alert('Ошибка сервера! Повторите регистрацию позже!')
                         console.log(error.response)
                     });
-                //}
+                }
             }
         }
     }

@@ -30,6 +30,7 @@ namespace Auctionator
         {
             // Регистрация сервисов
             services.AddScoped<IAuctionService, AuctionService>();
+            services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IUserService, UserService>();
 
             services.Configure<CookiePolicyOptions>(options =>

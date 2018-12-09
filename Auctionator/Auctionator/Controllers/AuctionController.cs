@@ -14,7 +14,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Auctionator.Controllers
 {
-    [Route("u")]
+    [Route("auction")]
     public class AuctionController : Controller
     {
         readonly IHubContext<AuctionHub> _hubContext;
@@ -58,7 +58,7 @@ namespace Auctionator.Controllers
             try
             {
                 _auctionService.Complete(auctionId);
-                return Json(new { success = true, status = HttpStatusCode.OK });
+                return Json(new { success = true, result = HttpStatusCode.OK });
             }
             catch (Exception ex)
             {
@@ -78,7 +78,7 @@ namespace Auctionator.Controllers
             try
             {
                 _auctionService.EndPayTime(auctionId);
-                return Json(new { success = true, status = HttpStatusCode.OK });
+                return Json(new { success = true, result = HttpStatusCode.OK });
             }
             catch (Exception ex)
             {
