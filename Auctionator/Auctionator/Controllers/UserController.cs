@@ -13,6 +13,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Auctionator.Controllers
 {
+    [Route("")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
@@ -37,10 +38,11 @@ namespace Auctionator.Controllers
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
         }
 
-        [HttpPost]
+
         [ValidateAntiForgeryToken]
+        [HttpPost]
         [Route("register")]
-        public async Task<JsonResult> Register(string userData)
+        public async Task<JsonResult> Register([FromBody]string userData)
         {
             UserDto userDto = JsonConvert.DeserializeObject<UserDto>(userData);
             try
