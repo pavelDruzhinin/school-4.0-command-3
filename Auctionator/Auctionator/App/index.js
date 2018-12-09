@@ -3,6 +3,7 @@ import App from './App.vue'
 import Category from './components/Category.vue'
 import Lot from './components/Lot.vue'
 import Router from 'vue-router'
+import Navbar from   './components/Navbar.vue'
 
 Vue.use(Router)
 
@@ -23,13 +24,15 @@ new Vue({
     router,
     template: 
         `<div>
+        <Navbar/>
+        <div class="container body-content">
     <router-link to="/category/1">category1</router-link>
     <router-link to="/category/2">category2</router-link>
 <router-view></router-view>
          <hr/><footer>
         <p>Copyright 2018 - Auctionator. All rights reserved by Command - 3 team.</p>
-        </footer></div>`,
-    components: { App },
+        </footer></div></div>`,
+    components: { App, Navbar },
 
     data: function() {
         return { isActive: true }
