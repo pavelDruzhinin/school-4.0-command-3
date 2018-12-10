@@ -63,21 +63,21 @@ export default {
   },
   methods: {
     onSubmit() {
+      var that = this;
       axios({
         method: "post",
-        url: "/products/create",
+        url: "/product/create",
         data: {
           "Name": this.name,
           "Description": this.description,
           "Price": this.price
         }
       })
-        .then(function(response) {
-          console.log(response);
-          debugger;
-          var productId = response.data.productId;
+        .then(function(response) {          
+          var productId = response.data.result;
+          
           // upload images
-          this.submitFiles(productId);
+          that.submitFiles(productId);
         })
         .catch(function(error) {
 
@@ -85,12 +85,17 @@ export default {
     },
     submitFiles(productId) {
       let formData = new FormData();
-      for (let index = 0; index < this.files.length; index++) {
-        const file = this.files[index];
+      for (let i = 0; i < this.files.length; i++) {
+        var file = this.files[i];
         formData.append('files['+i+']', file);
       }
 
-      axios.post(`/product/upload-img/${productId}`)
+      axios.post(`/product/upload-img/${productId}`, formData,
+      {
+        headers: {
+          'Content-Type':'multipart/form-data'
+        }
+      })
     },
     handleFileUploads() {
         this.files =this.$refs.files.files;
