@@ -5,6 +5,7 @@ import Category from './components/Category.vue'
 import Lot from './components/Lot.vue'
 import Register from './components/Register.vue'
 import Navbar from   './components/Navbar.vue'
+import ProductCreation from './components/ProductCreation.vue'
 
 Vue.use(Router)
 
@@ -12,7 +13,8 @@ const routes = [
     { name: 'Main', path: '/', component: App },
     { name: 'Categories', path: '/category/:id', component: Category },
     { name: 'Lots', path: '/lot/:id', component: Lot },
-    { name: 'Register', path: '/register', component: Register }
+    { name: 'Register', path: '/register', component: Register },
+    { name: 'ProductCreation', path: '/create', component: ProductCreation}
 ]
 
 const router = new Router({
