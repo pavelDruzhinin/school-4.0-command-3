@@ -21,7 +21,7 @@ namespace Auctionator.Controllers
     public class ProductsController : Controller
     {
         private readonly IProductService _productService;
-        IHostingEnvironment _appEnvironment;
+        private readonly IHostingEnvironment _appEnvironment;
 
         public ProductsController(IProductService productService, IHostingEnvironment appEnvironment)
         {
@@ -76,14 +76,12 @@ namespace Auctionator.Controllers
 
         [HttpPost]
         [Route("edit/{id:int}")]
-        public async Task<JsonResult> Edit(string product, int id)
+        public async Task<JsonResult> Edit([FromBody] ProductDto productDto, int id)
         {
-            ProductDto productDto = JsonConvert.DeserializeObject<ProductDto>(product);
-
             try
             {
-                var prod = await _productService.Edit(id, productDto);
-                return Json(new { success = true, result = prod });
+                await _productService.Edit(id, productDto);
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
@@ -91,33 +89,13 @@ namespace Auctionator.Controllers
             }
         }
 
-        [HttpPost]
         [Route("delete/{id:int}")]
-        public async Task<JsonResult> Delete(string product, int id)
+        public async Task<JsonResult> Delete(int id)
         {
-            ProductDto productDto = JsonConvert.DeserializeObject<ProductDto>(product);
-
             try
             {
-                var prod = await _productService.Delete(id);
-                return Json(new { success = true, result = prod });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, result = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("save/{id:int}")]
-        public async Task<JsonResult> Save(string product, int id)
-        {
-            ProductDto productDto = JsonConvert.DeserializeObject<ProductDto>(product);
-
-            try
-            {
-                var prod = await _productService.Save(id, productDto);
-                return Json(new { success = true, result = prod });
+                await _productService.Delete(id);
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
@@ -138,6 +116,8 @@ namespace Auctionator.Controllers
                 return Json(new { success = false, result = ex.Message });
             }
         }
+
+        //TODO: проверить остальные методы
 
         [HttpPost]
         [Route("addsubscription/{productId:int}")]

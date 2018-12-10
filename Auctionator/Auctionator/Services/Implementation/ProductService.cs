@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Auctionator.Enums;
 
 namespace Auctionator.Services.Implementation
 {
@@ -18,9 +19,10 @@ namespace Auctionator.Services.Implementation
             _db = db;
         }
 
-        public async Task<ProductPhoto> AddPhotos(IList<ProductPhoto> photos)
+        public async Task AddPhotos(IList<ProductPhoto> photos)
         {
-
+            await _db.ProductPhotos.AddRangeAsync(photos);
+            await _db.SaveChangesAsync();
         }
 
         public async Task<Product> Create(ProductDto productDto)
@@ -41,71 +43,43 @@ namespace Auctionator.Services.Implementation
             return newProduct;
         }
 
-        public async Task<Product> Edit(int ProductId, ProductDto productDto)
+        public async Task Edit(int productId, ProductDto productDto)
         {
-            var product = await _db.Products.FindAsync(ProductId);
-            _db.Products.Attach(product);
-            product.Name = productDto.Name;
-            product.Price = productDto.Price;
-            product.Photos = productDto.Photos;
-            product.Description = productDto.Description;
-            product.ShortDescription = productDto.ShortDescription;
-            product.Status = productDto.Status;                
-            _db.Products.Update(product);
-            return product;
-        }
-
-        public async Task<Product> Delete(int ProductId)
-        {
-            var product = await _db.Products.FirstOrDefaultAsync(p => p.Id == ProductId);
-            product.Status = Enums.ProductStatus.Deleted;
+            var product = await _db.Products.FindAsync(productId);
             if (product != null)
             {
-                _db.Products.Remove(product);                
-            }
-            _db.SaveChanges();
-            return product;
-        }
-
-        public async Task<Product> Save(int ProductId, ProductDto productDto)
-        {
-            if (ProductId == 0)
-            {
-                await _db.Products.AddAsync(new Product());
-            }
-            else
-            {
-                var product = await _db.Products.FirstOrDefaultAsync(p => p.Id == ProductId);
-
+                _db.Products.Attach(product);
                 product.Name = productDto.Name;
                 product.Price = productDto.Price;
-                product.Photos = productDto.Photos;
                 product.Description = productDto.Description;
-                product.ShortDescription = productDto.ShortDescription;
-                product.Status = productDto.Status;
+                product.ShortDescription = productDto.ShortDescription;             
+                await _db.SaveChangesAsync();
             }
-            _db.SaveChanges();
-
-            return await _db.Products.FirstOrDefaultAsync(p => p.Id == ProductId);
         }
 
-        public async Task<Product> Details(int ProductId)
+        public async Task Delete(int productId)
         {
-            var product = await _db.Products
-                .Include(p => p.Name)
-                .Include(p => p.Price)
-                .Include(p => p.Photos)
-                .Include(p => p.Description)
-                .Include(p => p.ShortDescription)
-                .Include(p => p.Status)
-                .Include(p => p.SubscribedProducts)
-                .Include(p => p.AuctionId)
-                .Include(p => p.OwnerId)
-                .Include(p => p.BuyerId)                
-                .FirstOrDefaultAsync(p => p.Id == ProductId);
+            var product = await _db.Products.
+                Where(x => x.Status != ProductStatus.Deleted).
+                FirstOrDefaultAsync(p => p.Id == productId);
+
+            if (product != null)
+            {
+                _db.Products.Attach(product);
+                product.Status = Enums.ProductStatus.Deleted;
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task<Product> Details(int productId)
+        {
+            var product = await _db.Products            
+                .FirstOrDefaultAsync(p => p.Id == productId);
             
             return product;
         }
+
+        //TODO: проверить остальные методы!!!
 
         public async Task<SubscribedProduct> AddSubscription(SubscribedProductDto subscribedProductDto)
         {
