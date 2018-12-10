@@ -27,7 +27,9 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        
+        <li class="nav-item">
+         <a class="nav-link active" href="/create">Создать новый товар</a>
+        </li>
       </ul>
     </div>
     <div>Container for user</div>
