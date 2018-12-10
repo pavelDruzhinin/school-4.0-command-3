@@ -20,12 +20,24 @@
         placeholder="Введите описание товара"
       >
     </div>
+      <div class="form-group">
+      <label for="price">Цена</label>
+      <input
+        v-model="price"
+        type="number"
+        class="form-control"
+        id="price"
+        placeholder="Введите цену товара"
+      >
+    </div>
     <div class="form-group">
-      <button
-        type="file"
-        class="btn btn-outline-secondary"
-        id="download-images"
-      >Загрузить изображения</button>
+        
+<div class="form-group">
+      <label>Загрузить файлы
+        <input multiple accept="image/*" type="file" id="file" ref="files" @change="handleFileUploads"/>
+      </label>       
+    </div>
+
     </div>
     <div class="form-group">
       <input type="checkbox" id="create-auction">
@@ -44,7 +56,9 @@ export default {
   data() {
     return {
         name:this.name,
-        description: this.description
+        description: this.description,
+        price: this.price,
+        files:''
     };
   },
   methods: {
@@ -55,17 +69,31 @@ export default {
         data: {
           "Name": this.name,
           "Description": this.description,
-          "Price": "556",
-          "OwnerId":"2",
-          "AuctionId":"22"
+          "Price": this.price
         }
       })
         .then(function(response) {
-          console.log(response.success);
+          console.log(response);
+          debugger;
+          var productId = response.data.productId;
+          // upload images
+          this.submitFiles(productId);
         })
         .catch(function(error) {
-          console.log(this);
+
         });
+    },
+    submitFiles(productId) {
+      let formData = new FormData();
+      for (let index = 0; index < this.files.length; index++) {
+        const file = this.files[index];
+        formData.append('files['+i+']', file);
+      }
+
+      axios.post(`/product/upload-img/${productId}`)
+    },
+    handleFileUploads() {
+        this.files =this.$refs.files.files;
     }
   }
 };
