@@ -31,9 +31,9 @@ namespace Auctionator.Controllers
 
         [HttpPost]
         [Route("upload-img/{productId:int}")]
-        public async Task<JsonResult> AddPhotos(IFormFileCollection uploads, int productId)
+        public async Task<JsonResult> AddPhotos(int productId)
         {
-            var files = this.Request.Form.Files;
+            var files = Request.Form.Files;
             try
             {
                 IList<ProductPhoto> photos = new List<ProductPhoto>();
