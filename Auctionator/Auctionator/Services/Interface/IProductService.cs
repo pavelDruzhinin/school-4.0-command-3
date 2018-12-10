@@ -12,6 +12,7 @@ namespace Auctionator.Services.Interface
         Task<Product> Delete(int ProductId);
         Task<Product> Save(int ProductId, ProductDto productDto);
         Task<Product> Details(int ProductId);
+        Task AddPhotos(IList<ProductPhoto> photos);
         Task<SubscribedProduct> AddSubscription(SubscribedProductDto subscribedProductDto);
         Task<List<Product>> GetAll(Enums.ProductStatus status);
         Task<List<Product>> GetProductsByOwner(string userId);

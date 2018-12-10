@@ -18,13 +18,17 @@ namespace Auctionator.Services.Implementation
             _db = db;
         }
 
+        public async Task<ProductPhoto> AddPhotos(IList<ProductPhoto> photos)
+        {
+
+        }
+
         public async Task<Product> Create(ProductDto productDto)
         {
             var newProduct = new Product()
             {
                 Name = productDto.Name,
                 Price = productDto.Price,
-                Photos = productDto.Photos,
                 Description = productDto.Description,
                 ShortDescription = productDto.ShortDescription,
                 Status = Enums.ProductStatus.WaitAuction,
