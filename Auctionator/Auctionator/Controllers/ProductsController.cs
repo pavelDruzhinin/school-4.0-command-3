@@ -23,14 +23,14 @@ namespace Auctionator.Controllers
 
         [HttpPost]
         [Route("create")]
-        public async Task<JsonResult> Create(string product)
+        public async Task<JsonResult> Create([FromBody]ProductDto product)
         {
-            ProductDto productDto = JsonConvert.DeserializeObject<ProductDto>(product);
-
             try
             {
-                var prod = await _productService.Create(productDto);
-                prod.OwnerId = User.Identity.Name;
+                var prod = await _productService.Create(product);
+                
+                // TODO Find a way to use identity
+                //prod.OwnerId = User.Identity.Name;
                 return Json(new { success = true, result = prod });
             }
             catch (Exception ex)
