@@ -6,11 +6,18 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Auctionator.Models
 {
-    /// <summary>
-    ///  ласс User наследует все пол€ IdentityUser, в т.ч. UserName
-    /// </summary>
-    public class User : IdentityUser 
+    public class User
     {
+        public string Id { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Name { get; set; }
+
+        public User()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
+
         /// <summary>
         /// “овары пользовател€, выставленные на продажу
         /// </summary>

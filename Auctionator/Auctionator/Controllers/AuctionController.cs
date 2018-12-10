@@ -38,7 +38,7 @@ namespace Auctionator.Controllers
             try
             {
                 await _auctionService.Activate(auctionId);
-                return Json(new { success = true, status = HttpStatusCode.OK });
+                return Json(new { success = true, result = HttpStatusCode.OK });
             }
             catch (Exception ex)
             {
@@ -58,7 +58,7 @@ namespace Auctionator.Controllers
             try
             {
                 await _auctionService.Complete(auctionId);
-                return Json(new { success = true, status = HttpStatusCode.OK });
+                return Json(new { success = true, result = HttpStatusCode.OK });
             }
             catch (Exception ex)
             {
@@ -78,7 +78,7 @@ namespace Auctionator.Controllers
             try
             {
                 await _auctionService.EndPayTime(auctionId);
-                return Json(new { success = true, status = HttpStatusCode.OK });
+                return Json(new { success = true, result = HttpStatusCode.OK });
             }
             catch (Exception ex)
             {

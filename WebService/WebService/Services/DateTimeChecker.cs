@@ -79,44 +79,58 @@ namespace WebService.Services
         /// </summary>
         public async void Run()
         {
-            await GetDataFromDb(); // в первую очередь нужно получить данные из БД, если ещё действительны
-
-            var startDateTime = StartIds.FirstOrDefault();
-            var endDateTime = EndIds.FirstOrDefault();
-            var endPayDateTime = EndPayIds.FirstOrDefault();
-
-            while (true)
+            try
             {
-                DateTime currentDateTime = DateTime.Now;
-                if (_isUpdated) // проверка, обновился ли словарь (это может произойти после обработки запроса в HadnleRequest())
+                await GetDataFromDb(); // в первую очередь нужно получить данные из БД, если ещё действительны
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            finally
+            {
+                var startDateTime = StartIds.FirstOrDefault();
+                var endDateTime = EndIds.FirstOrDefault();
+                var endPayDateTime = EndPayIds.FirstOrDefault();
+
+                while (true)
                 {
-                    startDateTime = StartIds.FirstOrDefault();
-                    endDateTime = EndIds.FirstOrDefault();
-                    endPayDateTime = EndPayIds.FirstOrDefault();
-                    _isUpdated = false;
+                    DateTime currentDateTime = DateTime.Now;
+                    if (_isUpdated
+                    ) // проверка, обновился ли словарь (это может произойти после обработки запроса в HadnleRequest())
+                    {
+                        startDateTime = StartIds.FirstOrDefault();
+                        endDateTime = EndIds.FirstOrDefault();
+                        endPayDateTime = EndPayIds.FirstOrDefault();
+                        _isUpdated = false;
+                    }
+
+                    if (startDateTime.Key <= currentDateTime &&
+                        startDateTime.Key != default(DateTime))
+                    {
+                        await SendRequestAsync(_startDateTimeUri, startDateTime.Value);
+                        StartIds.Remove(startDateTime.Key);
+                        startDateTime = StartIds.FirstOrDefault();
+                    }
+
+                    if (endDateTime.Key <= currentDateTime &&
+                        endDateTime.Key != default(DateTime))
+                    {
+                        await SendRequestAsync(_endDateTimeUri, endDateTime.Value);
+                        EndIds.Remove(endDateTime.Key);
+                        endDateTime = EndIds.FirstOrDefault();
+                    }
+
+                    if (endPayDateTime.Key <= currentDateTime &&
+                        endPayDateTime.Key != default(DateTime))
+                    {
+                        await SendRequestAsync(_endPayDateTimeUri, endPayDateTime.Value);
+                        EndPayIds.Remove(endPayDateTime.Key);
+                        endPayDateTime = EndPayIds.FirstOrDefault();
+                    }
+
+                    Thread.Sleep(500);
                 }
-                if (startDateTime.Key <= currentDateTime &&
-                    startDateTime.Key != default(DateTime))
-                {
-                    await SendRequestAsync(_startDateTimeUri, startDateTime.Value);
-                    StartIds.Remove(startDateTime.Key);
-                    startDateTime = StartIds.FirstOrDefault();
-                }
-                if (endDateTime.Key <= currentDateTime &&
-                    endDateTime.Key != default(DateTime))
-                {
-                    await SendRequestAsync(_endDateTimeUri, endDateTime.Value);
-                    EndIds.Remove(endDateTime.Key);
-                    endDateTime = EndIds.FirstOrDefault();
-                }
-                if (endPayDateTime.Key <= currentDateTime &&
-                    endPayDateTime.Key != default(DateTime))
-                {
-                    await SendRequestAsync(_endPayDateTimeUri, endPayDateTime.Value);
-                    EndPayIds.Remove(endPayDateTime.Key);
-                    endPayDateTime = EndPayIds.FirstOrDefault();
-                }
-                Thread.Sleep(500);
             }
         }
 
@@ -139,7 +153,7 @@ namespace WebService.Services
             {
                 Console.WriteLine(e);
             }
-                   
+
         }
 
         /// <summary>
@@ -162,7 +176,7 @@ namespace WebService.Services
                 {
                     Console.WriteLine($"\nDateTimeChecker.HandleResponse(): Запрос по адресу {uri} прошёл успешно!");
                     Console.WriteLine("Полученные данные");
-                    Console.WriteLine(responseContent.result);
+                    Console.WriteLine(responseContent);
                     //Console.WriteLine();
                 }
             }
