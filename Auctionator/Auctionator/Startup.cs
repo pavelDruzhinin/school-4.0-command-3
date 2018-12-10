@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ using Auctionator.Hubs;
 using Microsoft.AspNetCore.Http.Connections;
 using Auctionator.Services.Interface;
 using Auctionator.Services.Implementation;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Auctionator
 {
@@ -26,9 +28,10 @@ namespace Auctionator
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // регистрация сервисов
+            // Регистрация сервисов
             services.AddScoped<IAuctionService, AuctionService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IUserService, UserService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -39,8 +42,15 @@ namespace Auctionator
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<User>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            // Подключение сервиса аутентификации
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => //CookieAuthenticationOptions
+                {
+                    options.Cookie.MaxAge = TimeSpan.FromDays(30);
+                    options.LoginPath = new PathString("/login");
+                    options.LogoutPath = new PathString("/logout");
+                });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
