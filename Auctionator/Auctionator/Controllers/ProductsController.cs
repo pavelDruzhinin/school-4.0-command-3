@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Auctionator.Hubs;
+using Auctionator.Models;
 using Auctionator.Models.Dtos;
 using Auctionator.Services.Interface;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
@@ -11,27 +17,56 @@ using Newtonsoft.Json.Converters;
 
 namespace Auctionator.Controllers
 {
-    [Route("products")]
+    [Route("product")] // TODO: не забыть изменить ссылки в представлениях!!!!
     public class ProductsController : Controller
     {
         private readonly IProductService _productService;
+        private readonly IHostingEnvironment _appEnvironment;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, IHostingEnvironment appEnvironment)
         {
             _productService = productService;
+            _appEnvironment = appEnvironment;
+        }
+
+        [HttpPost]
+        [Route("upload-img/{productId:int}")]
+        public async Task<JsonResult> AddPhotos(IFormFileCollection uploads, int productId)
+        {
+            try
+            {
+                IList<ProductPhoto> photos = new List<ProductPhoto>();
+                foreach (var uploadedFile in uploads)
+                {
+                    // путь к папке с изображениями
+                    string path = "/images/products/" + productId + "/" + uploadedFile.FileName;
+                    // сохраняем файл в папку в каталоге wwwroot
+                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+                    {
+                        await uploadedFile.CopyToAsync(fileStream);
+                    }
+                    ProductPhoto photo = new ProductPhoto { ProductId = productId, Path = path };
+                    photos.Add(photo);
+                }
+                await _productService.AddPhotos(photos);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
+
         }
 
         [HttpPost]
         [Route("create")]
-        public async Task<JsonResult> Create([FromBody]ProductDto product)
+        public async Task<JsonResult> Create([FromBody]ProductDto productDto)
         {
             try
             {
-                var prod = await _productService.Create(product);
-                
-                // TODO Find a way to use identity
-                //prod.OwnerId = User.Identity.Name;
-                return Json(new { success = true, result = prod });
+                //productDto.OwnerId = User.Identity.Name; //TODO: раскомментировать!!!
+                var prod = await _productService.Create(productDto);
+                return Json(new { success = true, result = prod.Id });
             }
             catch (Exception ex)
             {
@@ -41,14 +76,12 @@ namespace Auctionator.Controllers
 
         [HttpPost]
         [Route("edit/{id:int}")]
-        public async Task<JsonResult> Edit(string product, int id)
+        public async Task<JsonResult> Edit([FromBody] ProductDto productDto, int id)
         {
-            ProductDto productDto = JsonConvert.DeserializeObject<ProductDto>(product);
-
             try
             {
-                var prod = await _productService.Edit(id, productDto);
-                return Json(new { success = true, result = prod });
+                await _productService.Edit(id, productDto);
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
@@ -56,33 +89,13 @@ namespace Auctionator.Controllers
             }
         }
 
-        [HttpPost]
         [Route("delete/{id:int}")]
-        public async Task<JsonResult> Delete(string product, int id)
+        public async Task<JsonResult> Delete(int id)
         {
-            ProductDto productDto = JsonConvert.DeserializeObject<ProductDto>(product);
-
             try
             {
-                var prod = await _productService.Delete(id);
-                return Json(new { success = true, result = prod });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, result = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("save/{id:int}")]
-        public async Task<JsonResult> Save(string product, int id)
-        {
-            ProductDto productDto = JsonConvert.DeserializeObject<ProductDto>(product);
-
-            try
-            {
-                var prod = await _productService.Save(id, productDto);
-                return Json(new { success = true, result = prod });
+                await _productService.Delete(id);
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
@@ -103,6 +116,8 @@ namespace Auctionator.Controllers
                 return Json(new { success = false, result = ex.Message });
             }
         }
+
+        //TODO: проверить остальные методы
 
         [HttpPost]
         [Route("addsubscription/{productId:int}")]
@@ -134,7 +149,7 @@ namespace Auctionator.Controllers
                 return Json(new { success = false, result = ex.Message });
             }
         }
-        
+
         [Route("myownproducts/{id:int}")]
         public async Task<JsonResult> GetProductsByOwner(string userId)
         {
