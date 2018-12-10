@@ -33,15 +33,24 @@ namespace Auctionator.Controllers
         [Route("upload-img/{productId:int}")]
         public async Task<JsonResult> AddPhotos(IFormFileCollection uploads, int productId)
         {
+            var files = this.Request.Form.Files;
             try
             {
                 IList<ProductPhoto> photos = new List<ProductPhoto>();
-                foreach (var uploadedFile in uploads)
+                foreach (var uploadedFile in files)
                 {
                     // путь к папке с изображениями
-                    string path = "/images/products/" + productId + "/" + uploadedFile.FileName;
+                    string path = $"/images/products/{productId}/{uploadedFile.FileName}";
+                    string fullPathToImage = _appEnvironment.WebRootPath + path;
+
+                    // проверяем существует ли директория, если нет, то создаем
+                    if (!Directory.Exists(Path.GetDirectoryName(fullPathToImage)))
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(fullPathToImage));
+                    }
+
                     // сохраняем файл в папку в каталоге wwwroot
-                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+                    using (var fileStream = new FileStream(fullPathToImage, FileMode.Create))
                     {
                         await uploadedFile.CopyToAsync(fileStream);
                     }
