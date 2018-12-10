@@ -27,10 +27,8 @@ namespace Auctionator.Services.Implementation
                 Photos = productDto.Photos,
                 Description = productDto.Description,
                 ShortDescription = productDto.ShortDescription,
-                Status = productDto.Status,
-                AuctionId = productDto.AuctionId,
+                Status = Enums.ProductStatus.WaitAuction,
                 OwnerId = productDto.OwnerId
-                
             };
 
             await _db.Products.AddAsync(newProduct);
@@ -55,16 +53,13 @@ namespace Auctionator.Services.Implementation
 
         public async Task<Product> Delete(int ProductId)
         {
-            var product = await _db.Products
-                .Include(p => p.Auction)
-                .Include(p => p.Buyer)
-                .Include(p => p.Owner)
-                .FirstOrDefaultAsync(p => p.Id == ProductId);
+            var product = await _db.Products.FirstOrDefaultAsync(p => p.Id == ProductId);
+            product.Status = Enums.ProductStatus.Deleted;
             if (product != null)
             {
-                _db.Products.Remove(product);
-                _db.SaveChanges();
+                _db.Products.Remove(product);                
             }
+            _db.SaveChanges();
             return product;
         }
 
