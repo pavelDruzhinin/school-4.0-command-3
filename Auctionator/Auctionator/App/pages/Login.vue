@@ -63,7 +63,7 @@
                 /*{*/ //TODO: Постараться сделать эту грёбанную проверку на клиенте
                 axios.post('/login', this.user)
                     .then(response => {
-                        console.log(response)
+                        console.log(response) // TODO: убрать ненужное
                         var result = response.data.result
                         if (response.data.success === true) {
                             var userInfo = { id: result.id, name: result.name, email: this.user.email }

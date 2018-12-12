@@ -29,10 +29,10 @@
                     <router-link to="/" class="nav-link" href="#">Home <span class="sr-only">(current)</span></router-link>
                 </li>
                 <li class="nav-item active">
-                    <router-link to="/" class="nav-link" href="#">Link</router-link>
+                    <router-link to="/register" class="nav-link" href="#">Регистрация</router-link>
                 </li>
                 <li class="nav-item active">
-                    <router-link to="/" class="nav-link" href="#">Link</router-link>
+                    <router-link to="/login" class="nav-link" href="#">Вход</router-link>
                 </li>
 
                 <li class="nav-item">
@@ -44,7 +44,9 @@
                 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form>
-            <div v-if="isAuth" class="alert alert-danger alert-dismissible fade show" role="alert">ЗАРЕГАН ТЫ!!!</div>
+            <div v-if="isAuth" class="alert alert-danger alert-dismissible fade show" role="alert">ЗАРЕГАН ТЫ!!!
+                <button v-on:click="logout" class="btn btn-outline-success my-2 my-sm-0" type="submit">Выйти нафиг</button>
+            </div>
             <div v-else class="alert alert-danger alert-dismissible fade show" role="alert">АВТОРИЗИРУЙСЯЫ!!!</div>
         </div>
     </nav>
@@ -53,6 +55,7 @@
 <script>
     import routes from '../index.js'
     import getIsAuth from '../auth.js'
+    import axios from "axios"
     export default {
         components: {
             routes
@@ -74,6 +77,18 @@
         methods: {
             updateAuth() {
                 this.isAuth = getIsAuth()
+            },
+            logout() {
+                axios.get('/logout')
+                    .then(response => {
+                        console.log(response) // TODO: убрать ненужное
+                        alert('Выход был выполнен') // TODO: заменить на нормальное диалоговое окно или всплывающее сообщение
+                    })
+                    .catch(response => {
+                        console.log(response) // TODO: убрать ненужное
+                    })
+                localStorage.removeItem('user')
+                this.updateAuth()
             }
         }
     }
