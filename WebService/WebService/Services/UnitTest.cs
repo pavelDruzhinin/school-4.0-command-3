@@ -13,7 +13,7 @@ namespace WebService.Services
         public UnitTest()
         {
             Uri = ""; // Адрес самого сервиса
-            ConnectionUri = "http://localhost:50321/"; // Адрес подключения
+            ConnectionUri = "http://localhost:5000/"; // Адрес подключения
         }      
 
         public async void Run()
