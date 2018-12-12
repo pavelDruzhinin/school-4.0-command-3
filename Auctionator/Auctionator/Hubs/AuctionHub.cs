@@ -11,10 +11,16 @@ namespace Auctionator.Hubs
             await Clients.All.SendAsync("Notify", $"{Context.User.Identity.Name} присоединился к аукциону");
             await base.OnConnectedAsync();
         }
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             await Clients.All.SendAsync("Notify", $"{Context.User.Identity.Name} покинул аукцион");
             await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task Send(string message)
+        {
+            await this.Clients.All.SendAsync("Send", message);
         }
     }
 }
