@@ -79,23 +79,28 @@
         methods: {
             handleSubmit: function () {
                 if (this.isValid) {
-                    axios.post('/register', this.user,
-                        { withCredentials: true })
+                    axios.post('/register', this.user)
                     .then(response => {
                         console.log(response)
-                        this.responseMsg = response.data.result
+                        var result = response.data.result
                         if (response.data.success === true) {
-                            alert('Вы были успешно зарегистрированы и авторизованы!')
+                            var userInfo = { id: result.id, name: result.name, email: this.user.email }
+                            localStorage.setItem('user', JSON.stringify(userInfo))
+                            var savedUser = JSON.parse(localStorage.getItem('user')) //TODO: убрать эту строку
+                            alert('Вы были успешно зарегистрированы и авторизованы, ' + savedUser.name) // TODO: заменить на нормальное диалоговое окно или всплывающее сообщение
                             this.$router.push('/')
+                        }
+                        else {
+                            this.responseMsg = result
                         }
                     })
                     .catch(error => {
-                        alert('Ошибка сервера! Повторите регистрацию позже!')
+                        alert('Ошибка! Повторите регистрацию позже!')
                         console.log(error.response)
                     });
                 }
             }
-        }
+        },
     }
 </script>
 
