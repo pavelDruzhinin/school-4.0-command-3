@@ -13,7 +13,6 @@ axios.defaults.withCredentials = true;
 
 const routes = [
     { name: 'Main', path: '/', component: AuctionList },
-    { name: 'Categories', path: '/category/:id', component: Category },
     { name: 'Lots', path: '/lot/:id', component: Lot },
     { name: 'Register', path: '/register', component: Register },
     { name: 'Login', path: '/login', component: Login }
