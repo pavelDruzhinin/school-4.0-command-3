@@ -39,20 +39,42 @@
                     <router-link to="/" class="nav-link disabled" href="#">Disabled</router-link>
                 </li>
             </ul>
+
             <form class="form-inline my-2 my-lg-0">
                 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form>
-
+            <div v-if="isAuth" class="alert alert-danger alert-dismissible fade show" role="alert">ЗАРЕГАН ТЫ!!!</div>
+            <div v-else class="alert alert-danger alert-dismissible fade show" role="alert">АВТОРИЗИРУЙСЯЫ!!!</div>
         </div>
     </nav>
 </template>
 
 <script>
     import routes from '../index.js'
+    import getIsAuth from '../auth.js'
     export default {
         components: {
             routes
+        },
+        data: function () {
+            return {
+                isAuth: getIsAuth()
+            }
+        },
+        created() {
+            // загружаем данные, когда представление создано
+            // и данные реактивно отслеживаются
+            this.updateAuth()
+        },
+        watch: {
+            // при изменениях маршрута запрашиваем данные снова
+            '$route': 'updateAuth'
+        },
+        methods: {
+            updateAuth() {
+                this.isAuth = getIsAuth()
+            }
         }
     }
 </script>

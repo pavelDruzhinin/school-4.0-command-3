@@ -11,8 +11,11 @@
                         <div class="form-group has-success">
                             <input class="form-control input-lg" placeholder="Введите пароль" v-model.trim="user.password" type="password">
                         </div>
-                        <!--<div v-show="!isValid" class="alert alert-danger" role="alert"></div>-->
-                        <button v-on:click="handleSubmit" class="btn btn-lg btn-primary btn-block">Войти</button>
+                        <div v-if="isResponseMsg" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{errorMsg}}
+                        </div>
+                        <button v-on:click="handleAuth" class="btn btn-lg btn-primary btn-block">Войти</button>
+                        <button v-on:click="handleRegister" class="btn btn-lg btn-success btn-block">Зарегистрироваться</button>
                     </fieldset>
                 </div>
             </div>
@@ -34,53 +37,56 @@
                         email: '',
                         password: ''
                     },
-                    passwordMsg: 'Не введён пароль.',
-                    emailMsg: 'Неверно введён E-mail.',
-                    errorMsg: 'Неверно введён E-mail или пароль',
-                    err: false
+                    //passwordMsg: 'Не введён пароль.',
+                    //emailMsg: 'Неверно введён E-mail.',
+                    errorMsg: '',
                 }
             },
-        computed: {
-            validation: function () {
-                return {
-                    email: emailRE.test(this.user.email),
-                    passwordNotEmpty: this.user.password === '' ? false : true,
-                }
-            },
-            isValid: function () {
-                var validation = this.validation
-                return Object.keys(validation).every(function (key) {
-                    return validation[key]
-                })
-            },
-        },
+        //computed: {
+        //    validation: function () {
+        //        return {
+        //            email: emailRE.test(this.user.email),
+        //            passwordNotEmpty: this.user.password === '' ? false : true,
+        //        }
+        //    },
+        //    isValid: function () {
+        //        var validation = this.validation
+        //        return Object.keys(validation).every(function (key) {
+        //            return validation[key]
+        //        })
+        //    },
+        //},
         // methods
         methods: {
-            handleSubmit: function () {
-                /*if (this.isValid) */{
-                    axios.post('/login', this.user)
-                        .then(response => {
-                            console.log(response)
-                            var result = response.data.result
-                            if (response.data.success === true) {
-                                var userInfo = { id: result.id, name: result.name, email: this.user.email }
-                                localStorage.setItem('user', JSON.stringify(userInfo))
-                                var savedUser = JSON.parse(localStorage.getItem('user')) //TODO: убрать эту строку
-                                alert('Вы были успешно авторизованы, ' + savedUser.name) // TODO: заменить на нормальное диалоговое окно или всплывающее сообщение
-                                this.$router.push('/')
-                            }
-                            else {
-                                this.errorMsg = result
-                            }
-                        })
-                        .catch(error => {
-                            alert('Ошибка! Повторите вход позже!')
-                            console.log(error.response)
-                        });
-                }
+            handleAuth: function () {
+                /*if (this.isValid) */
+                /*{*/ //TODO: Постараться сделать эту грёбанную проверку на клиенте
+                axios.post('/login', this.user)
+                    .then(response => {
+                        console.log(response)
+                        var result = response.data.result
+                        if (response.data.success === true) {
+                            var userInfo = { id: result.id, name: result.name, email: this.user.email }
+                            localStorage.setItem('user', JSON.stringify(userInfo))
+                            var savedUser = JSON.parse(localStorage.getItem('user')) //TODO: убрать эту строку
+                            alert('Вы были успешно авторизованы, ' + savedUser.name) // TODO: заменить на нормальное диалоговое окно или всплывающее сообщение
+                            this.$router.push('/')
+                        }
+                        else {
+                            this.errorMsg = result
+                        }
+                    })
+                    .catch(error => {
+                        alert('Ошибка! Повторите вход позже!')
+                        console.log(error.response)
+                    });
+            },
+            handleRegister() {
+                this.$router.push('/register')
             }
         }
     }
+
 </script>
 
 <style lang="scss">

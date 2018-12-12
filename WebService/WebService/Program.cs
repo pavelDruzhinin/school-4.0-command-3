@@ -25,7 +25,7 @@ namespace WebService
 
 
             Task.Run(() => dateTimeChecker.Run()); // запуск сервиса проверки дат и времени
-            Task.Run(() => unitTester.Run()); // запуск сервиса юнит-тестов
+            //Task.Run(() => unitTester.Run()); // запуск сервиса юнит-тестов
             Task.Run(() => Server.ListenAsync(dateTimeChecker)); // запуск сервера
 
             while (true)
