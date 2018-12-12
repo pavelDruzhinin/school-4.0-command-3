@@ -29,7 +29,6 @@ namespace Auctionator.Services.Implementation
         public async Task<User> GetUser(string email)
         {
             User user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
-            var a = user;
             return user;
         }
 

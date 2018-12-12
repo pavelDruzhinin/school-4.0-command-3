@@ -51,7 +51,7 @@ namespace Auctionator.Controllers
 
                 var user = await _userService.AddUserAsync(userDto); // добавление пользователя в БД
                 await Authenticate(user.Id, user.Email, user.Name); // аутентификация пользователя, создание Cookie для него
-                return Json(new { success = true, result = "" });
+                return Json(new { success = true, result = new { id = user.Id, name = user.Name } });
             }
             catch (Exception ex)
             {
@@ -61,18 +61,16 @@ namespace Auctionator.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<JsonResult> Login(string userData)
+        public async Task<JsonResult> Login([FromBody]UserDto userDto)
         {
             try
             {
-                UserDto userDto = JsonConvert.DeserializeObject<UserDto>(userData);
-
                 var user = await _userService.GetUser(userDto.Email, userDto.Password);
                 if (user == null)
                     throw new Exception("Неправильный E-mail или пароль!");
 
                 await Authenticate(user.Id, user.Email, user.Name); // аутентификация пользователя, создание Cookie для него
-                return Json(new { success = true });
+                return Json(new { success = true, result = new {id = user.Id, name = user.Name} });
             }
             catch (Exception ex)
             {
