@@ -1,9 +1,10 @@
 ﻿<template>
     <div>
         <header-vue></header-vue>
-        <router-view></router-view>
-        <hr />
-        <footer>
+        <transition name="fade">
+            <router-view></router-view>
+        </transition>
+        <hr /><footer>
             <p>Copyright 2018 - Auctionator. All rights reserved by Command - 3 team.</p>
         </footer>
     </div>
@@ -19,3 +20,18 @@
         },
     }
 </script>
+
+<style>
+       .fade-enter-active, .fade-leave-active {
+  transition-property: opacity;
+  transition-duration: .25s;
+}
+
+.fade-enter-active {
+  transition-delay: .25s;
+}
+
+.fade-enter, .fade-leave-active {
+  opacity: 0
+}
+</style>
