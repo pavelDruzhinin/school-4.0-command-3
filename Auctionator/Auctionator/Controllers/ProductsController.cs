@@ -123,7 +123,7 @@ namespace Auctionator.Controllers
         }
 
         [HttpGet]
-        [Route("{productId:int}/payment-info")]
+        [Route("payment-info/{productId:int}")]
         public async Task<JsonResult> GetPaymentInfo(int productId)
         {
             try

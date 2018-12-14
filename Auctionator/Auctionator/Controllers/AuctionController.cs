@@ -303,7 +303,7 @@ namespace Auctionator.Controllers
         }
 
         [HttpGet]
-        [Route("{auctionId}/pay")]
+        [Route("pay/{auctionId:int}")]
         public async Task<JsonResult> PayProduct(int auctionId)
         {
             try

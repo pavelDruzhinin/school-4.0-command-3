@@ -81,7 +81,7 @@
         },
         created() {
             //console.log('Введённый адрес: /product/' + this.productId + '/get-payment-info')
-            axios.get('/product/' + this.productId + '/payment-info')
+            axios.get('/product/payment-info/' + this.productId)
                 .then(response => {
                     console.log(response) // TODO: убрать ненужное
                     var result = response.data.result
@@ -108,7 +108,7 @@
         methods: {
             pay() {
                 if (this.productStatus == status.onPayment) {
-                    axios.get('/auction/' + this.auctionId + '/pay')
+                    axios.get('/auction/pay/' + this.auctionId)
                         .then(response => {
                             console.log(response) // TODO: убрать ненужное
                             var result = response.data.result
