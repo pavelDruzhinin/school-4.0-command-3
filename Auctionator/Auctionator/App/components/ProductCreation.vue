@@ -20,29 +20,17 @@
         placeholder="Введите описание товара"
       >
     </div>
-      <div class="form-group">
-      <label for="price">Цена</label>
-      <input
-        v-model="price"
-        type="number"
-        class="form-control"
-        id="price"
-        placeholder="Введите цену товара"
-      >
-    </div>
     <div class="form-group">
-        
-<div class="form-group">
-      <label>Загрузить файлы
-        <input multiple accept="image/*" type="file" id="file" ref="files" @change="handleFileUploads"/>
-      </label>       
+        <label for="price">Стартовая цена</label>
+        <input
+          v-model="price"
+          type="number"
+          class="form-control"
+          id="price"
+          placeholder="Введите стартовую цену товара"
+        >
     </div>
-
-    </div>
-    <div class="form-group">
-      <input type="checkbox" id="create-auction">
-      <label class="form-check-label" for="create-auction">Создать аукцион</label>
-    </div>
+    <vue-dropzone ref="dropzone" id="drop1" :options="dropOptions"></vue-dropzone>
     <br>
     <button type="button" class="btn btn-primary" @click="onSubmit">Submit</button>
   </form>
@@ -51,6 +39,7 @@
 
 <script>
 import axios from "axios";
+import vueDropzone from "vue2-dropzone";
 
 export default {
   data() {
@@ -58,9 +47,15 @@ export default {
         name:this.name,
         description: this.description,
         price: this.price,
-        files:''
+        files:'',
+      dropOptions:{
+          url: '/product/upload-img/',
+          addRemoveLinks: true,
+          uploadMultiple: true
+      }
     };
   },
+  components: {vueDropzone},
   methods: {
     onSubmit() {
       var that = this;
@@ -76,29 +71,11 @@ export default {
         .then(function(response) {          
           var productId = response.data.result;
           
-          // upload images
-          that.submitFiles(productId);
+          // upload images          
         })
         .catch(function(error) {
 
         });
-    },
-    submitFiles(productId) {
-      let formData = new FormData();
-      for (let i = 0; i < this.files.length; i++) {
-        var file = this.files[i];
-        formData.append('files['+i+']', file);
-      }
-
-      axios.post(`/product/upload-img/${productId}`, formData,
-      {
-        headers: {
-          'Content-Type':'multipart/form-data'
-        }
-      })
-    },
-    handleFileUploads() {
-        this.files =this.$refs.files.files;
     }
   }
 };
