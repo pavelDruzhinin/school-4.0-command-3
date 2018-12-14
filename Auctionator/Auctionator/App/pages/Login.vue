@@ -11,7 +11,7 @@
                         <div class="form-group has-success">
                             <input class="form-control input-lg" placeholder="Введите пароль" v-model.trim="user.password" type="password">
                         </div>
-                        <div v-if="isResponseMsg" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div v-if="errorMsg != ''" class="alert alert-danger alert-dismissible fade show" role="alert">
                             {{errorMsg}}
                         </div>
                         <button v-on:click="handleAuth" class="btn btn-lg btn-primary btn-block">Войти</button>

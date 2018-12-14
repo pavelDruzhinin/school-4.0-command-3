@@ -7,10 +7,10 @@ namespace Auctionator.Services.Interface
 {
     public interface IProductService
     {
-        Task<Product> Create(ProductDto productDto);
+        Task<Product> Create(ProductDto productDto, string userId);
         Task Edit(int productId, ProductDto productDto);
         Task Delete(int productId);
-        Task<Product> Details(int productId);
+        Task<Product> GetProduct(int productId);
         Task AddPhotos(IList<ProductPhoto> photos);
         Task<SubscribedProduct> AddSubscription(SubscribedProductDto subscribedProductDto);
         Task<List<Product>> GetAll(Enums.ProductStatus status);

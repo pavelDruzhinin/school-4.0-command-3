@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Auctionator.Enums;
 using Auctionator.Hubs;
 using Auctionator.Models;
 using Auctionator.Models.Dtos;
@@ -21,11 +22,15 @@ namespace Auctionator.Controllers
     public class ProductsController : Controller
     {
         private readonly IProductService _productService;
+        private readonly IUserService _userService;
+        private readonly IAuctionService _auctionService;
         private readonly IHostingEnvironment _appEnvironment;
 
-        public ProductsController(IProductService productService, IHostingEnvironment appEnvironment)
+        public ProductsController(IProductService productService, IHostingEnvironment appEnvironment, IUserService userService, IAuctionService auctionService)
         {
             _productService = productService;
+            _userService = userService;
+            _auctionService = auctionService;
             _appEnvironment = appEnvironment;
         }
 
@@ -64,8 +69,8 @@ namespace Auctionator.Controllers
         {
             try
             {
-                //productDto.OwnerId = User.Identity.Name; //TODO: раскомментировать!!!
-                var prod = await _productService.Create(productDto);
+                var ownerId = User.Identity.Name;
+                var prod = await _productService.Create(productDto, ownerId);
                 return Json(new { success = true, result = prod.Id });
             }
             catch (Exception ex)
@@ -108,12 +113,55 @@ namespace Auctionator.Controllers
         {
             try
             {
-                var product = await _productService.Details(id);
+                var product = await _productService.GetProduct(id);
                 return Json(new { success = true, result = product });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, result = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{productId:int}/payment-info")]
+        public async Task<JsonResult> GetPaymentInfo(int productId)
+        {
+            try
+            {
+                if(!User.Identity.IsAuthenticated)
+                    throw new Exception("Не пройдена авторизация!");
+                var product = await _productService.GetProduct(productId);
+                if (product == null || product.AuctionId == null ||
+                    product.Status == ProductStatus.Deleted ||
+                    product.Status == ProductStatus.OnAuction ||
+                    product.Status == ProductStatus.Paid)
+                {
+                    throw new Exception("Товар недоступен для покупки.");
+                }
+                var owner = await _userService.GetUserById(product.OwnerId);
+                var productPrice = product.Price; // Если установлена цена выкупа, значит возможна оплата товара по ней
+                if (product.Status == ProductStatus.OnPayment)
+                {
+                    var buyerId = User.Identity.Name;
+                    var auction = await _auctionService.GetAuctionById(product.AuctionId.Value);
+                   
+                    if (auction.WinnerId != buyerId) // если товар пытается купить не победитель
+                        throw new Exception("Товар недоступен для покупки.");
+                    productPrice = auction.LastBet;
+                }
+                ProductDto productDto = new ProductDto()
+                {
+                    Name = product.Name,
+                    OwnerName = owner.Name,
+                    Price = productPrice,
+                    Status = product.Status,
+                    AuctionId = product.AuctionId.Value
+                };
+                return Json(new { success = true, result = productDto});
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, result = e.Message });
             }
         }
 

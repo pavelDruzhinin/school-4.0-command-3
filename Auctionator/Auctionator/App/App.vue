@@ -16,7 +16,7 @@
     export default {
         components: {
             'header-vue': Header,
-            routes : routes
+            routes
         },
     }
 </script>

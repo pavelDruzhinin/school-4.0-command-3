@@ -83,6 +83,7 @@
                     .then(response => {
                         console.log(response) // TODO: убрать ненужное
                         alert('Выход был выполнен') // TODO: заменить на нормальное диалоговое окно или всплывающее сообщение
+                        this.$router.push('/')
                     })
                     .catch(response => {
                         console.log(response) // TODO: убрать ненужное

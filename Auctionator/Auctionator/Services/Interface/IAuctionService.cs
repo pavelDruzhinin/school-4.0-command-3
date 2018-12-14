@@ -14,12 +14,12 @@ namespace Auctionator.Services.Interface
         Task<Auction> Create(AuctionDto auctionDto);
         Task<Auction> Update(AuctionDto auctionDto, int id);
         Task<Auction> Delete(int id);
-        Task<Bet> AddBet(BetDto betDto);
+        Task<Bet> AddBet(BetDto betDto, string userId);
         Task<List<Bet>> GetAllBets(int auctionId);
         Task Activate(IList<int> auctionId);
         Task Complete(IList<int> auctionId);
         Task EndPayTime(IList<int> auctionId);
-        Task<Auction> Pay(int auctionId);
+        Task Pay(int auctionId, string buyerId);
         Task<List<Auction>> NotPayed(string userId);
     }
 }

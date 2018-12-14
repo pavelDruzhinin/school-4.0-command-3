@@ -25,7 +25,7 @@ namespace Auctionator.Services.Implementation
             await _db.SaveChangesAsync();
         }
 
-        public async Task<Product> Create(ProductDto productDto)
+        public async Task<Product> Create(ProductDto productDto, string ownerId)
         {
             var newProduct = new Product()
             {
@@ -34,7 +34,7 @@ namespace Auctionator.Services.Implementation
                 Description = productDto.Description,
                 ShortDescription = productDto.ShortDescription,
                 Status = Enums.ProductStatus.WaitAuction,
-                OwnerId = productDto.OwnerId
+                //OwnerId = productDto.OwnerId
             };
 
             await _db.Products.AddAsync(newProduct);
@@ -71,11 +71,11 @@ namespace Auctionator.Services.Implementation
             }
         }
 
-        public async Task<Product> Details(int productId)
+        public async Task<Product> GetProduct(int productId)
         {
             var product = await _db.Products            
                 .FirstOrDefaultAsync(p => p.Id == productId);
-            
+
             return product;
         }
 

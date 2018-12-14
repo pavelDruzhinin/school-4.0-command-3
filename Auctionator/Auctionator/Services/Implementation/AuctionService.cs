@@ -5,6 +5,7 @@ using Auctionator.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Auctionator.Services.Implementation
@@ -92,14 +93,12 @@ namespace Auctionator.Services.Implementation
             return await _db.Bets.Where(x => x.AuctionId == auctionId).OrderByDescending(x => x.Id).ToListAsync();
         }
 
-        public async Task<Bet> AddBet(BetDto betDto)
+        public async Task<Bet> AddBet(BetDto betDto, string userId)
         {
-            var auction = _db.Auctions.FirstOrDefaultAsync(x => x.Id == betDto.AuctionId);
-
             var newBet = new Bet()
             {
                 CurrentBet = betDto.CurrentBet,
-                UserId = betDto.UserId,
+                UserId = userId,
                 AuctionId = betDto.AuctionId
             };
 
@@ -119,7 +118,19 @@ namespace Auctionator.Services.Implementation
         public async Task Complete(IList<int> auctionId)
         {
             // завершение аукциона (/auction/end) (EndAuctions(IList<int> auctionIds))
-            _db.Auctions.Include(x => x.Product).Where(x => auctionId.Contains(x.Id)).ToList().ForEach(x => { x.Status = string.IsNullOrEmpty(x.WinnerId) ? Enums.AuctionStatus.Failed : Enums.AuctionStatus.OnPayment; x.Product.Status = string.IsNullOrEmpty(x.WinnerId) ? Enums.ProductStatus.WaitAuction : Enums.ProductStatus.OnPayment; });
+            _db.Auctions
+                .Include(x => x.Bets)
+                .Include(x => x.Product)
+                .Where(x => auctionId.Contains(x.Id))
+                .ToList()
+                .ForEach(x =>
+                {
+                    var lastBet = x.Bets.LastOrDefault(a => a.AuctionId == x.Id); // Находим последнюю ставку данного аукциона
+                    x.WinnerId = lastBet?.UserId;
+                    x.LastBet = lastBet?.CurrentBet;
+                    x.Status = string.IsNullOrEmpty(x.WinnerId) ? Enums.AuctionStatus.Failed : Enums.AuctionStatus.OnPayment;
+                    x.Product.Status = string.IsNullOrEmpty(x.WinnerId) ? Enums.ProductStatus.WaitAuction : Enums.ProductStatus.OnPayment;
+                });
             await _db.SaveChangesAsync();
         }
 
@@ -130,7 +141,7 @@ namespace Auctionator.Services.Implementation
             await _db.SaveChangesAsync();
         }
 
-        public async Task<Auction> Pay(int id)
+        public async Task Pay(int id, string buyerId)
         {
             var auction = await _db.Auctions.Include(x => x.Product).FirstOrDefaultAsync(x => x.Id == id && x.Status == Enums.AuctionStatus.OnPayment);
             if (auction != null)
@@ -140,12 +151,10 @@ namespace Auctionator.Services.Implementation
                 auction.Status = Enums.AuctionStatus.Completed;
                 auction.PaidStatus = Enums.PaidStatus.Paid;
                 auction.Product.Status = Enums.ProductStatus.Paid;
+                auction.Product.BuyerId = buyerId;
 
                 await _db.SaveChangesAsync();
-
             }
-
-            return auction;
         }
 
         public async Task<List<Auction>> NotPayed(string userId)

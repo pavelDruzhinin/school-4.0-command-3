@@ -110,10 +110,18 @@ namespace Auctionator.Controllers
         /// </summary>
         /// <param name="userId">Id пользователя</param>
         /// <returns></returns>
-        public async Task<JsonResult> GetUserAuctions(string userId)
+        
+        [Route("get-user-auctions")]
+        public async Task<JsonResult> GetUserAuctions()
         {
             try
             {
+                if (User.Identity.IsAuthenticated == false)
+                {
+                    throw new Exception("Не пройдена авторизация!");
+                }
+                var userId = User.Identity.Name;
+
                 var auctions = await _auctionService.GetAuctionsByUser(userId);
                 return Json(new { success = true, result = auctions });
             }
@@ -261,7 +269,10 @@ namespace Auctionator.Controllers
 
             try
             {
-                var currentBet = await _auctionService.AddBet(betDto);
+                if (!User.Identity.IsAuthenticated)
+                    throw new Exception("Не пройдена авторизация!");
+                var userId = User.Identity.Name;
+                var currentBet = await _auctionService.AddBet(betDto, userId);
                 await _hubContext.Clients.All.SendAsync("Notify", $"Добавлена новая ставка: {betDto.CurrentBet} - {DateTime.Now.ToShortTimeString()}");
                 return Json(new { success = true, result = currentBet });
             }
@@ -291,12 +302,15 @@ namespace Auctionator.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{auctionId}/pay")]
         public async Task<JsonResult> PayProduct(int auctionId)
         {
             try
             {
-                var product = await _auctionService.Pay(auctionId);
-                return Json(new { success = true, result = product });
+                var buyerId = User.Identity.Name;
+                await _auctionService.Pay(auctionId, buyerId);
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {

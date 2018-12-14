@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import App from './App.vue'
 import Lot from './pages/Lot.vue'
 import AuctionList from './pages/AuctionList.vue'
+import Payment from './pages/Payment.vue'
 import Register from './pages/Register.vue'
 import Login from './pages/Login.vue'
 import axios from 'axios'
@@ -13,6 +14,7 @@ axios.defaults.withCredentials = true;
 const routes = [
     { name: 'Main', path: '/', component: AuctionList },
     { name: 'Lots', path: '/lot/:id', component: Lot },
+    { name: 'Payment', path: '/payment/:productId', props: true, component: Payment },
     { name: 'Register', path: '/register', component: Register },
     { name: 'Login', path: '/login', component: Login }
 ];

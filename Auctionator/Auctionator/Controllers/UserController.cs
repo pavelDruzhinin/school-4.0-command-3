@@ -51,7 +51,7 @@ namespace Auctionator.Controllers
 
                 var user = await _userService.AddUserAsync(userDto); // добавление пользователя в БД
                 await Authenticate(user.Id, user.Email, user.Name); // аутентификация пользователя, создание Cookie для него
-                return Json(new { success = true, result = new { id = user.Id, name = user.Name } });
+                return Json(new { success = true, result = new { name = user.Name } });
             }
             catch (Exception ex)
             {
@@ -70,7 +70,7 @@ namespace Auctionator.Controllers
                     throw new Exception("Неправильный E-mail или пароль!");
 
                 await Authenticate(user.Id, user.Email, user.Name); // аутентификация пользователя, создание Cookie для него
-                return Json(new { success = true, result = new {id = user.Id, name = user.Name} });
+                return Json(new { success = true, result = new {name = user.Name} });
             }
             catch (Exception ex)
             {

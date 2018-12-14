@@ -31,6 +31,9 @@ bld/
 #wwwroot/css
 #wwwroot/js
 
+# Чтоб ни у кого больше настройик не слетали
+WebService/WebService/App.config
+
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
