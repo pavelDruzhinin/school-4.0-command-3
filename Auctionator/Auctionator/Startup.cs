@@ -47,7 +47,7 @@ namespace Auctionator
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => //CookieAuthenticationOptions
                 {
-                    options.Cookie.MaxAge = TimeSpan.FromDays(30);
+                    options.Cookie.MaxAge = TimeSpan.FromDays(3);
                     options.LoginPath = new PathString("/login");
                     options.LogoutPath = new PathString("/logout");
                 });

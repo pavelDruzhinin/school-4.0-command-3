@@ -273,7 +273,7 @@ namespace Auctionator.Controllers
                     throw new Exception("Не пройдена авторизация!");
                 var userId = User.Identity.Name;
                 var currentBet = await _auctionService.AddBet(betDto, userId);
-                await _hubContext.Clients.All.SendAsync("Notify", $"Добавлена новая ставка: {betDto.CurrentBet} - {DateTime.Now.ToShortTimeString()}");
+
                 return Json(new { success = true, result = currentBet });
             }
             catch (Exception ex)

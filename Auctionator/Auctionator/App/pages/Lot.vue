@@ -60,14 +60,16 @@
                     </div>
                 </div>
                 <div class="input-group col-md-8" style="margin-top: 30px;">
-                    <input type="number"
+                    <input v-model="auction.bet"
+                           type="number"
                            class="form-control"
                            placeholder="Ваша ставка"
                            aria-label="Ваша ставка"
                            aria-describedby="button-addition"
                            id="bet">
                     <div class="input-group-append">
-                        <button class="btn btn-danger"
+                        <button v-on:click="addBet"
+                                class="btn btn-danger"
                                 type="button"
                                 id="button-addition"
                                 style="width: 150px;">
@@ -88,32 +90,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="table-success">
-                                    <th scope="row">4</th>
-                                    <td class="text-center">Freddy</td>
-                                    <td>22.12.2018 13:15:27</td>
-                                    <td class="text-center">
-                                        12345
-                                        <span class="rubSmall">P</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td class="text-center">Craig</td>
-                                    <td>22.12.2018 13:15:27</td>
-                                    <td class="text-center">
-                                        2345
-                                        <span class="rubSmall">P</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td class="text-center">MotherKisser</td>
-                                    <td>22.12.2018 13:15:27</td>
-                                    <td class="text-center">
-                                        2145
-                                        <span class="rubSmall">P</span>
-                                    </td>
+                                <tr v-show="getBetList.length > 0" v-for="(betItem, index) in getBetList">
+                                    <!--<div v-show="index == 0" class="table-success">-->
+                                        <th scope="row">{{index}}</th>
+                                        <td class="text-center">{{betItem.userName}}</td>
+                                        <td>{{betItem.betDateTime}}</td>
+                                        <td class="text-center">
+                                            {{betItem.currentBet}}
+                                            <span class="rubSmall">P</span>
+                                        </td>
+                                    <!--</div>-->
                                 </tr>
                             </tbody>
                         </table>
@@ -132,24 +118,109 @@
 </template>
 
 <script>
-    import Vue from 'vue';
-    import VueAgile from "vue-agile";
-    import VueSignalR from '@latelier/vue-signalr';
+    import getIsAuth from '../auth.js'
+    import { HubConnectionBuilder } from '@aspnet/signalr'
 
-    Vue.use(VueSignalR, 'http://localhost:5000/auctionHub');
+    const hubConnection = new HubConnectionBuilder()
+        .withUrl('http://localhost:5000/auctionHub')
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
 
-    new Vue({
-        el: '#betList',
-        render: h => h(App),
-        created() {
-            this.$socket.start({
-                log: false
-            });
-        },
+    hubConnection.onclose(() => {
+        delay(100)
+        hubConnection.start()
+    })
+
+    hubConnection.on("Receive", function (newBet) {
+
+        console.log(newBet)
     });
 
+
     export default {
-        components: { VueAgile }
+
+        //sockets: {
+        //    // Equivalent of
+        //    // signalrHubConnection.on('someEvent', (data) => this.someActionWithData(data))
+        //    Receive(newBet) {
+        //        console.log(newBet)
+        //        //this.betList.push(newBet)
+        //        //if (this.betList.length() >= 10) {
+        //        //    this.betList.shift()
+        //        //}
+        //    }
+        //},
+
+        props: ['productId'],
+
+        data() {
+            return {
+                isAuth: getIsAuth(),
+                auction: { // Вынести в отдельный компонент
+                    bet: 0,
+                    betList: [], // свойства: userName, currentBet, betDatetime
+                    startDateTime: '',
+                    endDateTime: '',
+                },
+                product: { // Вынести в отдельный компонент
+                    name: '',
+                    status: '',
+                    ownerName: '',
+                    price: 0,
+                    description: '',
+                    photoPaths: ''
+                },
+            }
+        },
+
+        computed: {
+            getBetList: function() {
+                return this.auction.betList.reverse()
+            }
+        },
+
+        created() {
+            // Проверить, что productId приходит в типе string!!!
+            // В данном случае productId - идентификатор группы 
+            //this.$socket.invoke('JoinGroup', this.productId.toString())// подключение к группе при создании компонента
+            
+            //if (hubConnection.connectionClosed) {
+
+            //}  
+
+            hubConnection.start().then(() => {
+                //console.log('Connected state to Join Group: ')
+                hubConnection.invoke("JoinGroup", this.productId.toString())
+            })
+
+        },
+
+        updated() {
+            hubConnection.invoke("JoinGroup", this.productId.toString());
+        },
+
+        destroyed() {
+            //this.$socket.invoke('LeaveGroup', this.productId.toString()) // отключение от групп при удалении компонента
+            hubConnection.invoke("LeaveGroup", this.productId.toString());
+        },
+
+        methods:
+        {
+            addBet() {
+                if (!getIsAuth) {
+                    // если push перезагружает страницу, то попробовать выводить диалоговое окно
+                    // или объявить <router-link :to="" v-if=""></router-link :to="">
+                    this.$router.push('/login')
+                }
+                let bets = this.getBetList.length > 0 ? this.getBetList : [{currentBet: 0}]
+                if (this.auction.bet > bets[0].currentBet)
+                {
+                    //this.$socket.invoke('Send', this.productId.toString(), this.auction.bet.toString())
+                    hubConnection.invoke("Send", this.productId.toString(), this.auction.bet.toString());
+                }
+            },
+        },
+
     };
 
     $(function () {
@@ -193,5 +264,4 @@
         height: 350px;
         object-fit: cover;
     }
-
 </style>

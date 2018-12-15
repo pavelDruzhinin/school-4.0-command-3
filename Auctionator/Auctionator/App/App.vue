@@ -13,6 +13,7 @@
 <script>
     import Header from './components/Header.vue'
     import routes from './index.js'
+
     export default {
         components: {
             'header-vue': Header,

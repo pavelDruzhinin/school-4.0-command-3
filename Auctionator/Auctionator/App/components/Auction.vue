@@ -37,11 +37,6 @@
               }}'></Timer>
                 </div>
             </div>
-            <!-- add to cart btn -->
-            <div class="ecom bg-lblue">
-                <!--<a class="btn btn-orange" href="#">Сделать ставку</a>-->
-                <button class="btn btn-orange" @click="getProduct">Сделать ставку</button>
-            </div>
         </div>
     </div>
 </template>
