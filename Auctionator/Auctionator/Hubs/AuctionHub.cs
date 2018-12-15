@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Auctionator.Models.Dtos;
+using Auctionator.Services.Interface;
 
 namespace Auctionator.Hubs
 {
@@ -13,15 +14,16 @@ namespace Auctionator.Hubs
         /// Словарь: Id пользователя - группа
         /// </summary>
         public IDictionary<string, string> UserGroupDict { get; set; }
-        /// <summary>
-        /// Словарь: Id пользователя - ConnectionId
-        /// </summary>
-        public IDictionary<string, string> UserConnDict { get; set; }
 
-        public AuctionHub()
+        //public IDictionary<string, string> UserConnDict { get; set; }
+
+        private readonly IAuctionService _auctionService;
+
+        public AuctionHub(IAuctionService auctionService)
         {
+            _auctionService = auctionService;
             UserGroupDict = new Dictionary<string, string>();
-            UserConnDict = new Dictionary<string, string>();
+            //UserConnDict = new Dictionary<string, string>();
         }
 
         public async Task JoinGroup(string groupName)
@@ -31,7 +33,7 @@ namespace Auctionator.Hubs
 
             await Groups.AddToGroupAsync(connId, groupName);
 
-            UserConnDict.Add(userId, connId);
+            //UserConnDict.Add(userId, connId);
             UserGroupDict.Add(userId, groupName);
         }
 
@@ -42,28 +44,44 @@ namespace Auctionator.Hubs
 
             await Groups.RemoveFromGroupAsync(connId, groupName);
 
-            UserConnDict.Remove(userId);
+            //UserConnDict.Remove(userId);
             UserGroupDict.Remove(userId);
         }
 
-        public override async Task OnConnectedAsync()
-        {
-            var userId = Context.User.Identity.Name;
-            var connId = Context.ConnectionId;
+        //public override async Task OnConnectedAsync()
+        //{
+        //    var userId = Context.User.Identity.Name;
+        //    var connId = Context.ConnectionId;
 
-            // Если пользователь относится к этой группе, то добавляем его в системную группу при подключении
-            if (UserGroupDict.ContainsKey(userId))
+        //    // Если пользователь относится к этой группе, то добавляем его в системную группу при подключении
+        //    if (UserGroupDict.ContainsKey(userId))
+        //    {
+        //        await Groups.AddToGroupAsync(connId, UserGroupDict[userId]);
+        //    }
+        //   // UserConnDict[userId] = connId; // Запоминаем его новый ConnectionId
+        //    await base.OnConnectedAsync();
+        //}
+
+        public async Task Send(string groupName, double currentBet, string userName)
+        {
+            BetDto betDto = new BetDto()
             {
-                await Groups.AddToGroupAsync(connId, UserGroupDict[userId]);
-            }
-            UserConnDict[userId] = connId; // Запоминаем его новый ConnectionId
-            await base.OnConnectedAsync();
-        }
+                ProductId = Convert.ToInt32(groupName),
+                BetDateTime = DateTime.Now,
+                CurrentBet = currentBet,
+                UserName = userName
+            };
+            try
+            {
+                await _auctionService.AddBet(betDto, Context.User.Identity.Name);
 
-        public async Task Send(string groupName, double bet)
-        {
-            //TODO: сделать добавление ставки!!!
-            await Clients.Group(groupName).SendAsync("Receive", "RABOTAET!!!!");
+                await Clients.Group(groupName).SendAsync("GetBet", betDto);
+
+            }
+            catch (Exception e)
+            {
+                await Clients.Group(groupName).SendAsync("GetBet", e);
+            }
         }
     }
 }

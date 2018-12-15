@@ -44,22 +44,6 @@
             </div>
             <div class="col-md-6">
                 <div class="input-group col-md-8" style="margin-top: 30px;">
-                    <input type="number"
-                           class="form-control"
-                           placeholder="Стоимость"
-                           aria-label="Стоимость"
-                           aria-describedby="button-addition"
-                           id="cost">
-                    <div class="input-group-append">
-                        <button class="btn btn-success"
-                                type="button"
-                                id="button-buy-now"
-                                style="width: 150px;">
-                            Выкупить лот
-                        </button>
-                    </div>
-                </div>
-                <div class="input-group col-md-8" style="margin-top: 30px;">
                     <input v-model="auction.bet"
                            type="number"
                            class="form-control"
@@ -92,13 +76,13 @@
                             <tbody>
                                 <tr v-show="getBetList.length > 0" v-for="(betItem, index) in getBetList">
                                     <!--<div v-show="index == 0" class="table-success">-->
-                                        <th scope="row">{{index}}</th>
-                                        <td class="text-center">{{betItem.userName}}</td>
-                                        <td>{{betItem.betDateTime}}</td>
-                                        <td class="text-center">
-                                            {{betItem.currentBet}}
-                                            <span class="rubSmall">P</span>
-                                        </td>
+                                    <th scope="row">{{index}}</th>
+                                    <td class="text-center">{{betItem.userName}}</td>
+                                    <td>{{betItem.betDateTime}}</td>
+                                    <td class="text-center">
+                                        {{betItem.currentBet}}
+                                        <span class="rubSmall">P</span>
+                                    </td>
                                     <!--</div>-->
                                 </tr>
                             </tbody>
@@ -121,21 +105,27 @@
     import getIsAuth from '../auth.js'
     import { HubConnectionBuilder } from '@aspnet/signalr'
 
+    var betList = [] // свойства: userName, currentBet, betDatetime
+
     const hubConnection = new HubConnectionBuilder()
         .withUrl('http://localhost:5000/auctionHub')
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
-    hubConnection.onclose(() => {
-        delay(100)
-        hubConnection.start()
-    })
-
-    hubConnection.on("Receive", function (newBet) {
-
+    hubConnection.on("GetBet", function (newBet) {
         console.log(newBet)
+        betList.push(newBet)
+        if (betList.length >= 10) {
+            betList.shift()
+        }
     });
 
+    hubConnection.onclose(() => {
+        hubConnection.start().then(() => {
+            console.log('Join to Group: ')
+            hubConnection.invoke("JoinGroup", this.productId.toString())
+        })
+    })
 
     export default {
 
@@ -158,7 +148,6 @@
                 isAuth: getIsAuth(),
                 auction: { // Вынести в отдельный компонент
                     bet: 0,
-                    betList: [], // свойства: userName, currentBet, betDatetime
                     startDateTime: '',
                     endDateTime: '',
                 },
@@ -174,25 +163,20 @@
         },
 
         computed: {
-            getBetList: function() {
-                return this.auction.betList.reverse()
+            getBetList: function () {
+                return betList.reverse()
             }
         },
 
         created() {
             // Проверить, что productId приходит в типе string!!!
-            // В данном случае productId - идентификатор группы 
+            // В данном случае productId - идентификатор группы
             //this.$socket.invoke('JoinGroup', this.productId.toString())// подключение к группе при создании компонента
-            
-            //if (hubConnection.connectionClosed) {
-
-            //}  
 
             hubConnection.start().then(() => {
-                //console.log('Connected state to Join Group: ')
+                console.log('Join to Group: ')
                 hubConnection.invoke("JoinGroup", this.productId.toString())
             })
-
         },
 
         updated() {
@@ -212,11 +196,11 @@
                     // или объявить <router-link :to="" v-if=""></router-link :to="">
                     this.$router.push('/login')
                 }
-                let bets = this.getBetList.length > 0 ? this.getBetList : [{currentBet: 0}]
-                if (this.auction.bet > bets[0].currentBet)
-                {
+                let bets = this.getBetList.length > 0 ? this.getBetList : [{ currentBet: 0 }]
+                if (this.auction.bet > bets[0].currentBet) {
                     //this.$socket.invoke('Send', this.productId.toString(), this.auction.bet.toString())
-                    hubConnection.invoke("Send", this.productId.toString(), this.auction.bet.toString());
+                    let userName = JSON.parse(localStorage.getItem('user')).name
+                    hubConnection.invoke("Send", this.productId.toString(), this.auction.bet.toString(), userName).catch;
                 }
             },
         },

@@ -95,11 +95,15 @@ namespace Auctionator.Services.Implementation
 
         public async Task<Bet> AddBet(BetDto betDto, string userId)
         {
+
+            var auction = await _productService.GetAuctionByProduct(betDto.ProductId);
+
             var newBet = new Bet()
             {
                 CurrentBet = betDto.CurrentBet,
+                BetDateTime = betDto.BetDateTime,
                 UserId = userId,
-                AuctionId = betDto.AuctionId
+                AuctionId = auction.Id,
             };
 
             await _db.Bets.AddAsync(newBet);
