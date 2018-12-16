@@ -30,17 +30,18 @@ namespace Auctionator.Controllers
         }
 
         [HttpPost]
-        [Route("upload-img/{productId:int}")]
-        public async Task<JsonResult> AddPhotos(int productId)
+        [Route("upload-img")]
+        public async Task<JsonResult> AddPhotos(IFormFile file)
         {
             var files = Request.Form.Files;
             try
             {
+                var userName = User.Identity.Name;
                 IList<ProductPhoto> photos = new List<ProductPhoto>();
                 foreach (var uploadedFile in files)
                 {
                     // путь к папке с изображениями
-                    string path = $"/images/products/{productId}/{uploadedFile.FileName}";
+                    string path = $"/images/users/{userName}/{uploadedFile.FileName}";
                     string fullPathToImage = _appEnvironment.WebRootPath + path;
 
                     // проверяем существует ли директория, если нет, то создаем
@@ -54,10 +55,10 @@ namespace Auctionator.Controllers
                     {
                         await uploadedFile.CopyToAsync(fileStream);
                     }
-                    ProductPhoto photo = new ProductPhoto { ProductId = productId, Path = path };
-                    photos.Add(photo);
+                    //ProductPhoto photo = new ProductPhoto { ProductId = productId, Path = path };
+                    //photos.Add(photo);
                 }
-                await _productService.AddPhotos(photos);
+                //await _productService.AddPhotos(photos);
                 return Json(new { success = true });
             }
             catch (Exception ex)
@@ -73,8 +74,22 @@ namespace Auctionator.Controllers
         {
             try
             {
-                //productDto.OwnerId = User.Identity.Name; //TODO: раскомментировать!!!
+                productDto.OwnerId = User.Identity.Name; //TODO: раскомментировать!!!
+                IList<ProductPhoto> photos = new List<ProductPhoto>();
                 var prod = await _productService.Create(productDto);
+               
+
+                foreach (var photo in productDto.Photos)
+                {
+                    string path = $"/images/users/{productDto.OwnerId}/{photo.Path}";
+                    string fullPathToImage = _appEnvironment.WebRootPath + path;
+
+                    var photoItem = new ProductPhoto { ProductId = prod.Id, Path = fullPathToImage };
+                    photos.Add(photoItem);
+                }
+
+                await _productService.AddPhotos(photos);
+
                 return Json(new { success = true, result = prod.Id });
             }
             catch (Exception ex)
