@@ -13,7 +13,7 @@ namespace Auctionator.Hubs
         /// <summary>
         /// Словарь: Id пользователя - группа
         /// </summary>
-        public IDictionary<string, string> UserGroupDict { get; set; }
+        //public IDictionary<string, string> UserGroupDict { get; set; }
 
         //public IDictionary<string, string> UserConnDict { get; set; }
 
@@ -22,31 +22,31 @@ namespace Auctionator.Hubs
         public AuctionHub(IAuctionService auctionService)
         {
             _auctionService = auctionService;
-            UserGroupDict = new Dictionary<string, string>();
+            //UserGroupDict = new Dictionary<string, string>();
             //UserConnDict = new Dictionary<string, string>();
         }
 
-        public async Task JoinGroup(string groupName)
-        {
-            var userId = Context.User.Identity.Name;
-            var connId = Context.ConnectionId;
+        //public async Task JoinGroup(string groupName)
+        //{
+        //    var userId = Context.User.Identity.Name;
+        //    var connId = Context.ConnectionId;
 
-            await Groups.AddToGroupAsync(connId, groupName);
+        //    await Groups.AddToGroupAsync(connId, groupName);
 
-            //UserConnDict.Add(userId, connId);
-            UserGroupDict.Add(userId, groupName);
-        }
+        //    //UserConnDict.Add(userId, connId);
+        //    UserGroupDict.Add(userId, groupName);
+        //}
 
-        public async Task LeaveGroup(string groupName)
-        {
-            var userId = Context.User.Identity.Name;
-            var connId = Context.ConnectionId;
+        //public async Task LeaveGroup(string groupName)
+        //{
+        //    var userId = Context.User.Identity.Name;
+        //    var connId = Context.ConnectionId;
 
-            await Groups.RemoveFromGroupAsync(connId, groupName);
+        //    await Groups.RemoveFromGroupAsync(connId, groupName);
 
-            //UserConnDict.Remove(userId);
-            UserGroupDict.Remove(userId);
-        }
+        //    //UserConnDict.Remove(userId);
+        //    UserGroupDict.Remove(userId);
+        //}
 
         //public override async Task OnConnectedAsync()
         //{
@@ -62,25 +62,22 @@ namespace Auctionator.Hubs
         //    await base.OnConnectedAsync();
         //}
 
-        public async Task Send(string groupName, double currentBet, string userName)
+        public async Task Send(BetDto betDto, string userName)
         {
-            BetDto betDto = new BetDto()
-            {
-                ProductId = Convert.ToInt32(groupName),
-                BetDateTime = DateTime.Now,
-                CurrentBet = currentBet,
-                UserName = userName
-            };
             try
             {
-                await _auctionService.AddBet(betDto, Context.User.Identity.Name);
+                var userId = Context.User.Identity.Name;
+                betDto.BetDateTime = DateTime.Now;
+                await _auctionService.AddBet(betDto, userId);
 
-                await Clients.Group(groupName).SendAsync("GetBet", betDto);
+                await Clients.All.SendAsync("GetBet", betDto);
+                //await Clients.Group(groupName).SendAsync("GetBet", betDto);
 
             }
             catch (Exception e)
             {
-                await Clients.Group(groupName).SendAsync("GetBet", e);
+                //await Clients.Group(groupName).SendAsync("GetBet", e);
+                await Clients.All.SendAsync("GetBet", e);
             }
         }
     }

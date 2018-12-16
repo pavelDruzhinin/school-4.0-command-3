@@ -6,6 +6,7 @@ namespace Auctionator.Models.Dtos
     {
         public double CurrentBet { get; set; }
         public int ProductId { get; set; }
+        public int AuctionId { get; set; }
         public string UserName { get; set; }
         public DateTime BetDateTime { get; set; }
     }

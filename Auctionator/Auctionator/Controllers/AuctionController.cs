@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -105,12 +106,26 @@ namespace Auctionator.Controllers
             }
         }
 
+        [Route("get/{id:int}")]
+        public async Task<JsonResult> GetAuction(int id)
+        {
+            try
+            {
+                var auction = await _auctionService.GetAuctionById(id);
+                return Json(new { success = true, result = auction });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, result = e.Message });
+            }
+        }
+
         /// <summary>
         /// Список аукционов пользователя, где он победил
         /// </summary>
         /// <param name="userId">Id пользователя</param>
         /// <returns></returns>
-        
+
         [Route("get-user-auctions")]
         public async Task<JsonResult> GetUserAuctions()
         {
@@ -294,6 +309,7 @@ namespace Auctionator.Controllers
             try
             {
                 var bets = await _auctionService.GetAllBets(auctionId);
+                bets = bets.Take(10).ToList();
                 return Json(new { success = true, result = bets });
             }
             catch (Exception ex)

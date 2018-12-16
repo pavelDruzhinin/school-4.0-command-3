@@ -34,6 +34,20 @@ namespace Auctionator.Controllers
             _appEnvironment = appEnvironment;
         }
 
+        [Route("get/{id:int}")]
+        public async Task<JsonResult> GetProduct(int id)
+        {
+            try
+            {
+                var product = await _productService.GetProduct(id);
+                return Json(new { success = true, result = product });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, result = e.Message });
+            }
+        }
+
         [HttpPost]
         [Route("upload-img/{productId:int}")]
         public async Task<JsonResult> AddPhotos(IFormFileCollection uploads, int productId)

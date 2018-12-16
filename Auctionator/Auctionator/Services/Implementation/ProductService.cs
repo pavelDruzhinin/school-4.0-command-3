@@ -19,13 +19,6 @@ namespace Auctionator.Services.Implementation
             _db = db;
         }
 
-        public async Task<Auction> GetAuctionByProduct(int productId)
-        {
-            return await _db.Products
-                .Where(x => x.Id == productId)
-                .Select(x => x.Auction).FirstOrDefaultAsync();
-        }
-
         public async Task AddPhotos(IList<ProductPhoto> photos)
         {
             await _db.ProductPhotos.AddRangeAsync(photos);

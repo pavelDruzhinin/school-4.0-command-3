@@ -88,22 +88,34 @@ namespace Auctionator.Services.Implementation
             return auc;
         }
 
-        public async Task<List<Bet>> GetAllBets(int auctionId)
+        public async Task<List<BetDto>> GetAllBets(int auctionId)
         {
-            return await _db.Bets.Where(x => x.AuctionId == auctionId).OrderByDescending(x => x.Id).ToListAsync();
+            List<BetDto> betDtos = new List<BetDto>();
+            var bets = await _db.Bets.Include(x => x.User).Where(x => x.AuctionId == auctionId).OrderByDescending(x => x.BetDateTime)
+                .Select(x => new {x.User.Name, x.BetDateTime, x.CurrentBet})
+                .ToListAsync();
+
+            foreach (var bet in bets)
+            {
+                betDtos.Add(new BetDto()
+                {
+                    BetDateTime = bet.BetDateTime,
+                    CurrentBet = bet.CurrentBet,
+                    UserName = bet.Name
+                });
+            }
+
+            return betDtos;
         }
 
         public async Task<Bet> AddBet(BetDto betDto, string userId)
         {
-
-            var auction = await _productService.GetAuctionByProduct(betDto.ProductId);
-
             var newBet = new Bet()
             {
                 CurrentBet = betDto.CurrentBet,
                 BetDateTime = betDto.BetDateTime,
                 UserId = userId,
-                AuctionId = auction.Id,
+                AuctionId = betDto.AuctionId
             };
 
             await _db.Bets.AddAsync(newBet);

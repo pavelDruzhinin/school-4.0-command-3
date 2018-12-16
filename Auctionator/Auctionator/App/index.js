@@ -7,10 +7,10 @@ import Payment from './pages/Payment.vue'
 import Register from './pages/Register.vue'
 import Login from './pages/Login.vue'
 import axios from 'axios'
-//import VueSignalR from '@latelier/vue-signalr';
+import VueSignalR from '@latelier/vue-signalr';
 
 
-//Vue.use(VueSignalR, 'http://localhost:5000/auctionHub');
+Vue.use(VueSignalR, 'http://localhost:5000/auctionHub');
 
 Vue.use(Router);
 axios.defaults.withCredentials = true;
@@ -33,9 +33,9 @@ new Vue({
     el: '#app',
     router,
     render: h => h(App),
-    //created() {
-    //    this.$socket.start({
-    //        log: true // Active only in development for debugging.
-    //    });
-    //}
+    created() {
+        this.$socket.start({
+            log: true // Active only in development for debugging.
+        });
+    }
 });
