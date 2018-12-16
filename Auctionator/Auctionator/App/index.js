@@ -8,7 +8,8 @@ import Register from './pages/Register.vue'
 import Login from './pages/Login.vue'
 import axios from 'axios'
 import Navbar from   './components/Navbar.vue'
-import ProductCreation from './components/ProductCreation.vue'
+import ProductCreation from './pages/ProductCreation.vue'
+import ProductList from './pages/ProductList.vue'
 import VueSignalR from '@latelier/vue-signalr'
 
 Vue.use(VueSignalR, 'http://localhost:5000/auctionHub');
@@ -18,11 +19,12 @@ axios.defaults.withCredentials = true;
 
 const routes = [
     { name: 'Main', path: '/', component: AuctionList },
-    { name: 'Lots', path: '/lot/:productId', props: true, component: Lot },
+    { name: 'Lot', path: '/lot/:productId', props: true, component: Lot },
     { name: 'Payment', path: '/payment/:productId', props: true, component: Payment },
     { name: 'Register', path: '/register', component: Register },
-    { name: 'Login', path: '/login', component: Login }
-    { name: 'ProductCreation', path: '/create', component: ProductCreation }
+    { name: 'Login', path: '/login', component: Login },
+    { name: 'ProductCreation', path: '/create', component: ProductCreation },
+    { name: 'ProductList', path: '/cabinet/:itemStatus', props: true, component: ProductList }, // itemStatus: products, purchases, for-payment
 ];
 
 const router = new Router({

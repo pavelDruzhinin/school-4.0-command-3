@@ -46,8 +46,8 @@
                 </div>
                 <div class="col-md-6">
                     <div id="timer" class="timer">
-                        <Timer starttime="Sep 5, 2019 15:37:25"
-                               endtime="Dec 18, 2018 16:37:25"
+                        <Timer v-bind:starttime="auction.startDateTime"
+                               v-bind:endtime="auction.endDateTime"
                                trans='{
             "day":"Дни",
             "hours":"Часы",
@@ -90,7 +90,7 @@
                                 </button>
                             </div>
                         </div>
-                        <button class="btn btn-primary btn-block" type="button" style="margin-top: 20px;" disabled>Стартовая цена: {{auction.startPrice}}</button>
+                        <button class="btn btn-primary btn-block" type="button" style="margin-top: 20px;" disabled>Минимальная ставка: {{currentBet + 1}}</button>
                         <div class="card" style="margin-top:20px;">
                             <div class="card-body">
                                 <table class="table table-borderless">
@@ -107,7 +107,7 @@
                                             <!--<div v-show="index == 0" class="table-success">-->
                                             <th index scope="row">{{index + 1}}</th>
                                             <td class="text-center">{{betItem.userName}}</td>
-                                            <td>{{betItem.betDateTime}}</td>
+                                            <td>{{new Date(betItem.betDateTime).toLocaleDateString()}} {{new Date(betItem.betDateTime).toLocaleTimeString()}}</td>
                                             <td class="text-center">
                                                 {{betItem.currentBet}}
                                                 <span class="rubSmall">P</span>
@@ -205,7 +205,7 @@
                 },
                 product: { // Вынести в отдельный компонент
                     name: '',
-                    status: 1,
+                    status: 0,
                     description: '',
                     photoPaths: '',
                     ownerName: '',

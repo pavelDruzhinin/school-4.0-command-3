@@ -101,12 +101,12 @@ namespace Auctionator.Services.Implementation
 
         public async Task<List<Product>> GetProductsByOwner(string userId)
         {
-            return await _db.Products.Where(x => x.OwnerId == userId).Include(x => x.Owner).OrderByDescending(x => x.Id).ToListAsync();
+            return await _db.Products.Where(x => x.OwnerId == userId).OrderByDescending(x => x.Id).ToListAsync();
         }
 
         public async Task<List<Product>> GetBoughtProducts(string userId)
         {
-            return await _db.Products.Where(x => x.BuyerId == userId).Include(x => x.Buyer).OrderByDescending(x => x.Id).ToListAsync();
+            return await _db.Products.Where(x => x.BuyerId == userId).OrderByDescending(x => x.Id).ToListAsync();
         }
 
         public async Task<List<Product>> GetSaleProducts(string userId)

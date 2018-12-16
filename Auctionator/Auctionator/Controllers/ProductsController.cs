@@ -207,6 +207,22 @@ namespace Auctionator.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("own-products")]
+        public async Task<JsonResult> GetProductsByOwner()
+        {
+            try
+            {
+                var userId = User.Identity.Name;
+                var products = await _productService.GetProductsByOwner(userId);
+                return Json(new { success = true, result = products });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, result = ex.Message });
+            }
+        }
+
         [Route("getall")]
         public async Task<JsonResult> GetProducts(Enums.ProductStatus status)
         {
@@ -221,26 +237,13 @@ namespace Auctionator.Controllers
             }
         }
 
-        [Route("myownproducts/{id:int}")]
-        public async Task<JsonResult> GetProductsByOwner(string userId)
+        [Route("myboughtproducts")]
+        public async Task<JsonResult> GetBoughtProducts()
         {
             try
             {
-                var products = await _productService.GetProductsByOwner(userId);
-                return Json(new { success = true, result = products });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, result = ex.Message });
-            }
-        }
-
-        [Route("myboughtproducts/{id:int}")]
-        public async Task<JsonResult> GetBoughtProducts(string userId)
-        {
-            try
-            {
-                var products = await _productService.GetBoughtProducts(userId);
+                var userId = User.Identity.Name;
+                List<Product> products = await _productService.GetBoughtProducts(userId);
                 return Json(new { success = true, result = products });
             }
             catch (Exception ex)
