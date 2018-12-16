@@ -21,8 +21,8 @@
         </span>
         <div id="timer" class="timer">
           <Timer
-            starttime="Sep 5, 2019 15:37:25"
-            endtime="Dec 18, 2018 16:37:25"
+            v-bind:starttime="this.start"
+            v-bind:endtime="this.end"
             trans='{  
             "day":"Дни",
             "hours":"Часы",
@@ -51,31 +51,38 @@
 import axios from "axios";
 import Timer from "./Timer.vue";
 
+
 export default {
   data: function() {
     return {
-      currentPrice:""
+      currentPrice:this.auction.startPrice,
+      start: this.auction.startDateTime,
+      end: this.auction.endDateTime,
+      photo: ''
     }
   },
   props: ["auction"],
+ 
   methods: {
     getProduct: function() {
       
     }
   },
   components: { Timer },
-  created: function() {
+  mounted: function() {
       // keep the link to Vue object
-      let that = this;
+      let that = this;     
       axios
-        .get(`/Home/GetProduct?id=${that.auction.id}`)
+        .get(`/product/details/${that.auction.productId}`)
         .then(response => {
+          debugger;
           // handle success
+          that.photo = response.data.photos;
           if(response.data.lastBet == 0) {
-            that.currentPrice = response.data.startPrice;
+            that.currentPrice = response.data.startPrice            
           }
           else {
-            that.currentPrice = response.data.lastBet;
+            that.currentPrice = response.data.lastBet
           }
         })
         .catch(error => {
