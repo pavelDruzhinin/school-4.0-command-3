@@ -7,14 +7,14 @@ import Payment from './pages/Payment.vue'
 import Register from './pages/Register.vue'
 import Login from './pages/Login.vue'
 import axios from 'axios'
-import VueSignalR from '@latelier/vue-signalr';
-
+import Navbar from   './components/Navbar.vue'
+import ProductCreation from './components/ProductCreation.vue'
+import VueSignalR from '@latelier/vue-signalr'
 
 Vue.use(VueSignalR, 'http://localhost:5000/auctionHub');
 
 Vue.use(Router);
 axios.defaults.withCredentials = true;
-
 
 const routes = [
     { name: 'Main', path: '/', component: AuctionList },
@@ -22,6 +22,7 @@ const routes = [
     { name: 'Payment', path: '/payment/:productId', props: true, component: Payment },
     { name: 'Register', path: '/register', component: Register },
     { name: 'Login', path: '/login', component: Login }
+    { name: 'ProductCreation', path: '/create', component: ProductCreation }
 ];
 
 const router = new Router({

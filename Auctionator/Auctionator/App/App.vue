@@ -1,13 +1,16 @@
 ﻿<template>
     <div>
-        <header-vue></header-vue>
-        <transition name="fade">
-            <router-view></router-view>
-        </transition>
-        <hr /><footer>
-            <p>Copyright 2018 - Auctionator. All rights reserved by Command - 3 team.</p>
-        </footer>
-    </div>
+        <header-vue></header-vue> <!--Соединить Header и Navbar!!!--> 
+        <!--<Navbar />-->
+        <div class="container body-content">
+            <transition name="fade">
+                <router-view></router-view>
+            </transition>
+            <hr /><footer>
+                <p>Copyright 2018 - Auctionator. All rights reserved by Command - 3 team.</p>
+            </footer>
+        </div>
+        </div>
 </template>
 
 <script>
