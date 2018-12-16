@@ -30,6 +30,16 @@
           placeholder="Введите стартовую цену товара"
         >
     </div>
+    <div class="form-group">
+        <label for="auctionTime">Время начала аукциона</label>
+        <input
+          v-model="startDateTime"
+          type="Date"
+          class="form-control"
+          id="aucttionTime"
+          placeholder="Введите время начала аукциона"
+        >
+    </div>
     <vue-dropzone ref="dropzone" id="drop1" :options="dropOptions"></vue-dropzone>
     <br>
     <button type="button" class="btn btn-primary" @click="onSubmit">Submit</button>
@@ -44,10 +54,12 @@ import vueDropzone from "vue2-dropzone";
 export default {
   data() {
     return {
-        name:this.name,
-        description: this.description,
-        price: this.price,
+        name: '',
+        description: '',
+        price: '',
         files:'',
+        startDateTime: '',
+        productId:'',
       dropOptions:{
           url: '/product/upload-img/',
           addRemoveLinks: true,
@@ -57,28 +69,37 @@ export default {
   },
   components: {vueDropzone},
   methods: {
+    getUploadedFileNames() {      
+      var photo = {}
+      return this.$refs.dropzone.getAcceptedFiles().map(f => photo = {Path: f.name})
+    },
     onSubmit() {
       var that = this;
-      axios({
-        method: "post",
-        url: "/product/create",
-        data: {
-          "Name": this.name,
-          "Description": this.description,
-          "Price": this.price
-        }
-      })
-        .then(function(response) {          
-          var productId = response.data.result;
-          
-          // upload images          
-        })
-        .catch(function(error) {
+      var product = {
+        Name: this.name,
+        Price: this.price,
+        Description: this.description,
+        Photos: this.getUploadedFileNames()
+      }
 
-        });
-    }
+      axios.post('/product/create', product)
+        .then((resp) => {
+          console.log(that);
+          var prodId = resp.data.result;
+          var auction = {
+            startPrice: that.price,
+            productId: prodId,
+            startDateTime: that.startDateTime
+          }
+
+          axios.post('/auction/create', auction)
+          .then((rr) => {
+            alert("Ваш аукцион был создан")
+          })
+        })
+    }  
   }
-};
+}
 </script>
 
 
