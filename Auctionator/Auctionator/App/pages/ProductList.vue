@@ -13,7 +13,7 @@
                         </div>
                         <div class="col-md-2">
                             Статус:
-                            {{product.status}}
+                            {{getProductStatus(product.status)}}
                         </div>
                     </div>
                 </li>
@@ -64,12 +64,12 @@
                     return 'На аукционе'
                 } if (status == prodStatus.deleted) {
                     return 'Удалён'
-                } if (status == prodStatus.onAuction) {
-                    return 'На аукционе'
-                } if (status == prodStatus.onAuction) {
-                    return 'На аукционе'
-                } if (status == prodStatus.onAuction) {
-                    return 'На аукционе'
+                } if (status == prodStatus.onPayment) {
+                    return 'На оплате'
+                } if (status == prodStatus.paid) {
+                    return 'Оплачен'
+                } if (status == prodStatus.waitAuction) {
+                    return 'В ожидании аукциона'
                 }
             }
         }
