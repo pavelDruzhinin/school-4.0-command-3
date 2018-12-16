@@ -20,29 +20,25 @@
         placeholder="Введите описание товара"
       >
     </div>
-      <div class="form-group">
-      <label for="price">Цена</label>
-      <input
-        v-model="price"
-        type="number"
-        class="form-control"
-        id="price"
-        placeholder="Введите цену товара"
-      >
+    <div class="form-group">
+        <label for="price">Стартовая цена</label>
+        <input
+          v-model="price"
+          type="number"
+          class="form-control"
+          id="price"
+          placeholder="Введите стартовую цену товара"
+        >
     </div>
     <div class="form-group">
-        
-<div class="form-group">
-      <label>Загрузить файлы
-        <input multiple accept="image/*" type="file" id="file" ref="files" @change="handleFileUploads"/>
-      </label>       
+        <label for="auctionTime">Дата начала аукциона</label>
+        <input v-model="startDateTime"
+               type="date"
+               class="form-control"
+               id="aucttionTime"
+               placeholder="Введите дату и время время начала аукциона">
     </div>
-
-    </div>
-    <div class="form-group">
-      <input type="checkbox" id="create-auction">
-      <label class="form-check-label" for="create-auction">Создать аукцион</label>
-    </div>
+    <vue-dropzone ref="dropzone" id="drop1" :options="dropOptions"></vue-dropzone>
     <br>
     <button type="button" class="btn btn-primary" @click="onSubmit">Submit</button>
   </form>
@@ -51,57 +47,58 @@
 
 <script>
 import axios from "axios";
+import vueDropzone from "vue2-dropzone";
 
 export default {
   data() {
     return {
-        name:this.name,
-        description: this.description,
-        price: this.price,
-        files:''
+        name: '',
+        description: '',
+        price: '',
+        files:'',
+        startDateTime: '',
+        productId:'',
+      dropOptions:{
+          url: '/product/upload-img/',
+          addRemoveLinks: true,
+          uploadMultiple: true
+      }
     };
   },
+  components: {vueDropzone},
   methods: {
+    getUploadedFileNames() {      
+      var photo = {}
+      return this.$refs.dropzone.getAcceptedFiles().map(f => photo = {Path: f.name})
+    },
     onSubmit() {
       var that = this;
-      axios({
-        method: "post",
-        url: "/product/create",
-        data: {
-          "Name": this.name,
-          "Description": this.description,
-          "Price": this.price
-        }
-      })
-        .then(function(response) {          
-          var productId = response.data.result;
-          
-          // upload images
-          that.submitFiles(productId);
-        })
-        .catch(function(error) {
-
-        });
-    },
-    submitFiles(productId) {
-      let formData = new FormData();
-      for (let i = 0; i < this.files.length; i++) {
-        var file = this.files[i];
-        formData.append('files['+i+']', file);
+      var product = {
+        Name: this.name,
+        Price: this.price,
+        Description: this.description,
+        Photos: this.getUploadedFileNames()
       }
 
-      axios.post(`/product/upload-img/${productId}`, formData,
-      {
-        headers: {
-          'Content-Type':'multipart/form-data'
-        }
-      })
-    },
-    handleFileUploads() {
-        this.files =this.$refs.files.files;
-    }
+      axios.post('/product/create', product)
+        .then((resp) => {
+          console.log(that);
+          var prodId = resp.data.result;
+          var auction = {
+            startPrice: that.price,
+            productId: prodId,
+            startDateTime: that.startDateTime
+          }
+
+          axios.post('/auction/create', auction)
+          .then((rr) => {
+              alert("Ваш товар был добавлен на аукцион")
+              this.$router.push('/')
+          })
+        })
+    }  
   }
-};
+}
 </script>
 
 

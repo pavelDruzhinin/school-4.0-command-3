@@ -170,7 +170,7 @@ namespace Auctionator.Controllers
         /// </summary>
         /// <param name="count">Счетчик выводимых аукционов</param>
         /// <returns></returns>
-        [Route("getformain")]
+        [Route("getformain/{count:int}")]
         public async Task<JsonResult> GetAuctionForMain(int count)
         {
             try
@@ -191,10 +191,8 @@ namespace Auctionator.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task<JsonResult> Create(string auction)
+        public async Task<JsonResult> Create([FromBody]AuctionDto auctionDto)
         {
-            AuctionDto auctionDto = JsonConvert.DeserializeObject<AuctionDto>(auction, new IsoDateTimeConverter { DateTimeFormat = "dd.MM.yyyy HH:mm:ss" });
-
             try
             {
                 var auc = await _auctionService.Create(auctionDto);

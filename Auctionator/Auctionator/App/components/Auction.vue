@@ -1,28 +1,29 @@
 ﻿<template>
-    <div class="col-md-4 col-sm-6">
-        <!-- Restaurant Item -->
-        <div class="item">
-            <!-- Item's image -->
-            <img class="img-responsive" :src="'https://lorempixel.com/200/200/food/' + auction.id" alt>
-            <!-- Item details -->
-            <div class="item-dtls">
-                <!-- product title -->
-                <h4>
-                    <router-link :to="'lot/' + auction.id">{{ auction.title }}</router-link>
-                </h4>
-                <!-- price -->
-                <span class="price lblue">
-                    <p>
-                        <!-- <span v-if="auction.lastBet == '0'">Текущая цена: {{ auction.startPrice }}</span> -->
-                        <!-- <span v-else>Текущая цена: {{ auction.lastBet }}</span>             -->
-                        <span>{{ currentPrice }}</span>
-                        <span class="rub">Р</span>
-                    </p>
-                </span>
-                <div id="timer" class="timer">
-                    <Timer starttime="Sep 5, 2019 15:37:25"
-                           endtime="Dec 18, 2018 16:37:25"
-                           trans='{
+  <div class="col-md-4 col-sm-6">
+    <!-- Restaurant Item -->
+      <div class="item">
+          <router-link :to="'lot/' + productId">
+              <!-- Item's image -->
+              <img class="img-responsive" :src="'https://lorempixel.com/200/200/food/' + auction.id" alt>
+              <!-- Item details -->
+              <div class="item-dtls">
+                  <!-- product title -->
+                  <h4>
+                      {{ name }}
+
+                  </h4>
+                  <!-- price -->
+                  <span class="price lblue">
+                      <p>
+                          <!-- <span v-if="auction.lastBet == '0'">Текущая цена: {{ startPrice }}</span> -->
+                          <!-- <span v-else>Текущая цена: {{ lastBet }}</span>             -->
+                          <h3>Стартовая цена: {{ currentPrice }} руб.</h3>
+                      </p>
+                  </span>
+                  <div id="timer" class="timer">
+                      <Timer v-bind:starttime="this.start"
+                             v-bind:endtime="this.end"
+                             trans='{
             "day":"Дни",
             "hours":"Часы",
             "minutes":"Минуты",
@@ -35,8 +36,9 @@
                 "running":"Running",
                 "upcoming":"Future"
               }}'></Timer>
-                </div>
-            </div>
+                  </div>
+              </div>
+          </router-link>
         </div>
     </div>
 </template>
@@ -44,42 +46,62 @@
 <script>
     import axios from "axios";
     import Timer from "./Timer.vue";
-    export default {
-        data: function () {
-            return {
-                currentPrice: ""
-            }
-        },
-        props: ["auction"],
-        methods: {
-            getProduct: function () {
+    //export default {
+    //    data: function () {
+    //        return {
+    //            currentPrice: ""
+    //        }
+    //    },
+    //    props: ["auction"],
+    //    methods: {
+    //        getProduct: function () {
 
-            }
-        },
-        components: { Timer },
-        created: function () {
-            // keep the link to Vue object
-            let that = this;
-            axios
-                .get(`/Home/GetProduct?id=${that.auction.id}`)
-                .then(response => {
-                    // handle success
-                    if (response.data.lastBet == 0) {
-                        that.currentPrice = response.data.startPrice;
-                    }
-                    else {
-                        that.currentPrice = response.data.lastBet;
-                    }
-                })
-                .catch(error => {
-                    // handle error
-                    console.log(error);
-                })
-                .then(() => {
-                    // always executed
-                });
-        }
-    };
+export default {
+  data: function() {
+      return {
+       productId: '',
+      currentPrice:this.auction.startPrice,
+      start: this.auction.startDateTime,
+      end: this.auction.endDateTime,
+        photo: '',
+      name: ''
+    }
+  },
+  props: ["auction"],
+ 
+  methods: {
+    getProduct: function() {
+      
+    }
+  },
+  components: { Timer },
+  mounted: function() {
+      // keep the link to Vue object
+      let that = this;
+      that.productId = that.auction.productId
+      axios
+        .get(`/product/details/${that.auction.productId}`)
+        .then(response => {
+          debugger;
+          // handle success
+            that.name = response.data.result.name
+          that.photo = response.data.photos;
+            if (!that.auction.lastBet) {
+                that.currentPrice = that.auction.startPrice            
+          }
+          else {
+                that.currentPrice = that.auction.lastBet
+          }
+        })
+        .catch(error => {
+          // handle error
+          console.log(error);
+        })
+        .then(() => {
+          // always executed
+        });
+  }
+};
 </script>
 
 <style lang="scss">

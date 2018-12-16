@@ -1,4 +1,61 @@
 ﻿<template>
+    <div class="shop-items">
+        <div class="container-fluid">
+            <div class="row" v-for="i in Math.ceil(auctions.length / 3)">
+                <auction v-for="auction in auctions.slice((i-1) * 3, i * 3)" :key="auction.id" :auction="auction"></auction>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import Auction from '../components/Auction.vue'
+    import axios from 'axios'
+
+    export default {
+
+        data() {
+            return {
+                auctions: []
+            }
+        },
+        components: { Auction },
+        beforeCreate() {
+            var that = this;
+            axios.get('auction/getformain/10')
+                .then(response => {
+                    that.auctions = response.data.result;
+                })
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<template>
     <div>
         <div class="shop-items">
             <div class="container-fluid">
@@ -106,4 +163,4 @@
                     background: #fff;
                     color: #777;
                 }
-</style>
+</style>-->

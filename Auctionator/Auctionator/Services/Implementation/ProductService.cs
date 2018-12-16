@@ -34,7 +34,7 @@ namespace Auctionator.Services.Implementation
                 Description = productDto.Description,
                 ShortDescription = productDto.ShortDescription,
                 Status = Enums.ProductStatus.WaitAuction,
-                //OwnerId = productDto.OwnerId
+                OwnerId = ownerId
             };
 
             await _db.Products.AddAsync(newProduct);

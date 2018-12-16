@@ -23,6 +23,27 @@
             routes
         },
     }
+//=======
+//  import Auction from './components/Auction'
+//	import axios from 'axios'
+	
+//  export default { 
+    
+//    data() {
+//      return {
+//        auctions: []
+//      }   
+//    },
+//		components: {Auction},
+//		beforeCreate() {
+//			var that = this;
+//			axios.get('auction/getformain/10')
+//			.then(response => {
+//				that.auctions = response.data.result;
+//			})
+//		}
+//}
+//>>>>>>> MoveNavPanel
 </script>
 
 <style>

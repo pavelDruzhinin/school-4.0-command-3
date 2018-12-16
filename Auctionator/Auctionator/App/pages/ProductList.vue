@@ -27,7 +27,6 @@
     import prodStatus from "../enums/productStatus.js"
     import axios from "axios";
     export default {
-        props: ['itemStatus'],
         components: {
             routes
         },
@@ -40,7 +39,6 @@
             }
         },
         created() {
-            if (this.itemStatus == 'products') {
 
                 axios.get('/product/own-products').then(response => {
                     console.log(response)
@@ -56,7 +54,6 @@
                     console.log(err)
                 })
 
-            }
         },
         methods: {
             getProductStatus(status) {

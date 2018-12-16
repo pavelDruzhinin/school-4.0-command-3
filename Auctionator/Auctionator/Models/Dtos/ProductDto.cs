@@ -10,12 +10,14 @@ namespace Auctionator.Models.Dtos
     {
         public string Name { get; set; }
         public double? Price { get; set; }
-        public IList<string> PhotoPaths { get; set; }
+        public IList<ProductPhoto> Photos { get; set; }
         public string Description { get; set; }
         public string ShortDescription { get; set; }
         public ProductStatus Status { get; set; }
         public int AuctionId { get; set; }
         public string OwnerName { get; set; }
+        //public string OwnerId { get; set; }
         public string BuyerName { get; set; }
+        //public string BuyerId { get; set; }
     }
 }

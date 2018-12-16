@@ -40,7 +40,7 @@ namespace Auctionator.Services.Implementation
         {
             var dbCount = await _db.Auctions.CountAsync();
             count = dbCount < count ? dbCount : count;
-            return await _db.Auctions.Where(x => x.EndDateTime < System.DateTime.Now.AddMinutes(-1) && x.Status == Enums.AuctionStatus.Active).Take(count).OrderBy(x => x.EndDateTime).ToListAsync();
+            return await _db.Auctions.Where(x => x.EndDateTime > System.DateTime.Now.AddMinutes(-1) && x.Status == Enums.AuctionStatus.Active).Take(count).OrderBy(x => x.EndDateTime).ToListAsync();
         }
 
         public async Task<Auction> Create(AuctionDto auctionDto)

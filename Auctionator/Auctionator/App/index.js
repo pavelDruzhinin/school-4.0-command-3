@@ -24,7 +24,7 @@ const routes = [
     { name: 'Register', path: '/register', component: Register },
     { name: 'Login', path: '/login', component: Login },
     { name: 'ProductCreation', path: '/create', component: ProductCreation },
-    { name: 'ProductList', path: '/cabinet/:itemStatus', props: true, component: ProductList }, // itemStatus: products, purchases, for-payment
+    { name: 'ProductList', path: '/cabinet/products', component: ProductList }, // itemStatus: products, purchases, for-payment
 ];
 
 const router = new Router({
